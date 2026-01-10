@@ -19,15 +19,12 @@ export default function SponsorshipPage() {
   };
 
   const networkInfo: Record<NetworkKey, { name: string; symbol: string; color: string }> = {
-    btc: { name: "Bitcoin", symbol: "BTC", color: "bg-orange-500" },
     eth: { name: "Ethereum", symbol: "ETH", color: "bg-gray-800" },
     base: { name: "Base", symbol: "ETH", color: "bg-blue-500" },
     arb: { name: "Arbitrum", symbol: "ETH", color: "bg-blue-600" },
     op: { name: "Optimism", symbol: "ETH", color: "bg-red-500" },
     solana: { name: "Solana", symbol: "SOL", color: "bg-purple-500" },
     bsc: { name: "BNB Chain", symbol: "BNB", color: "bg-yellow-500" },
-    aptos: { name: "Aptos", symbol: "APT", color: "bg-indigo-600" },
-    sui: { name: "Sui", symbol: "SUI", color: "bg-blue-400" }
   };
 
   const handleCopyAddress = () => {
@@ -118,10 +115,11 @@ export default function SponsorshipPage() {
                 <button
                   key={key}
                   onClick={() => handleSelectNetwork(key)}
-                  className={`flex flex-col items-center p-4 rounded-xl border-2 transition-all ${selectedNetwork === key
+                  className={`flex flex-col items-center p-4 rounded-xl border-2 transition-all ${
+                    selectedNetwork === key
                       ? 'border-blue-500 bg-blue-50'
                       : 'border-gray-200 hover:border-gray-300'
-                    }`}
+                  }`}
                 >
                   <div className={`w-10 h-10 rounded-full ${network.color} flex items-center justify-center mb-2`}>
                     <span className="text-white text-xs font-bold">
@@ -149,10 +147,11 @@ export default function SponsorshipPage() {
                 </div>
                 <button
                   onClick={handleCopyAddress}
-                  className={`px-6 py-3 rounded-lg font-medium transition-colors ${copied
+                  className={`px-6 py-3 rounded-lg font-medium transition-colors ${
+                    copied
                       ? 'bg-green-500 text-white'
                       : 'bg-blue-600 text-white hover:bg-blue-700'
-                    }`}
+                  }`}
                 >
                   {copied ? currentContent.copied : currentContent.copyButton}
                 </button>
