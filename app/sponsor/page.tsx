@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-type NetworkKey = 'btc' | 'eth' | 'base' | 'arb' | 'op' | 'solana' | 'bsc' | 'aptos' | 'sui';
+type NetworkKey = 'eth' | 'base' | 'arb' | 'op' | 'solana' | 'bsc';
 
 export default function SponsorshipPage() {
   const [language, setLanguage] = useState<'en' | 'cn'>('en');
@@ -10,15 +10,12 @@ export default function SponsorshipPage() {
   const [copied, setCopied] = useState(false);
 
   const walletAddresses: Record<NetworkKey, string> = {
-    btc: "",
-    eth: "",
-    base: "",
-    arb: "",
-    op: "",
-    solana: "",
-    bsc: "",
-    aptos: "",
-    sui: ""
+    eth: "0x395d5b94f4d41Efe3B1084fBE373208E637210d1",
+    base: "0x395d5b94f4d41Efe3B1084fBE373208E637210d1",
+    arb: "0x395d5b94f4d41Efe3B1084fBE373208E637210d1",
+    op: "0x395d5b94f4d41Efe3B1084fBE373208E637210d1",
+    solana: "FvUEPcAYLTcKnaECX9ocPbAftWfYSiyRBAJSxMxGRaLW",
+    bsc: "0x395d5b94f4d41Efe3B1084fBE373208E637210d1",
   };
 
   const networkInfo: Record<NetworkKey, { name: string; symbol: string; color: string }> = {
@@ -121,11 +118,10 @@ export default function SponsorshipPage() {
                 <button
                   key={key}
                   onClick={() => handleSelectNetwork(key)}
-                  className={`flex flex-col items-center p-4 rounded-xl border-2 transition-all ${
-                    selectedNetwork === key
+                  className={`flex flex-col items-center p-4 rounded-xl border-2 transition-all ${selectedNetwork === key
                       ? 'border-blue-500 bg-blue-50'
                       : 'border-gray-200 hover:border-gray-300'
-                  }`}
+                    }`}
                 >
                   <div className={`w-10 h-10 rounded-full ${network.color} flex items-center justify-center mb-2`}>
                     <span className="text-white text-xs font-bold">
@@ -153,11 +149,10 @@ export default function SponsorshipPage() {
                 </div>
                 <button
                   onClick={handleCopyAddress}
-                  className={`px-6 py-3 rounded-lg font-medium transition-colors ${
-                    copied
+                  className={`px-6 py-3 rounded-lg font-medium transition-colors ${copied
                       ? 'bg-green-500 text-white'
                       : 'bg-blue-600 text-white hover:bg-blue-700'
-                  }`}
+                    }`}
                 >
                   {copied ? currentContent.copied : currentContent.copyButton}
                 </button>
