@@ -20,6 +20,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const savedTheme = localStorage.getItem('theme') as Theme;
     const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     const initialTheme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setTheme(initialTheme);
     setMounted(true);
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');

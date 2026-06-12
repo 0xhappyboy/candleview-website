@@ -1,14 +1,19 @@
-'use client';
+"use client";
 
-import { useEffect, useState, useRef, useCallback } from 'react';
-import { TEST_CANDLEVIEW_DATA8 } from '../mock/mock_data_1';
-import { useI18n } from '../providers/I18nProvider';
-import StaticMarker from './StaticMarker';
-import RealtimeData from './RealtimeData';
-import RemoteData from './RemoteData';
-import DataUpload from './DataUpload';
-import Emulator from './Emulator';
-import CandleView, { ICandleViewDataPoint } from 'candleview';
+import { useEffect, useState, useRef, useCallback } from "react";
+import { TEST_CANDLEVIEW_DATA8 } from "../mock/mock_data_1";
+import { useI18n } from "../providers/I18nProvider";
+import StaticMarker from "./StaticMarker";
+import RealtimeData from "./RealtimeData";
+import RemoteData from "./RemoteData";
+import DataUpload from "./DataUpload";
+import Emulator from "./Emulator";
+import {
+  CandleView,
+  ICandleViewDataPoint,
+  StaticMarkDirection,
+  TimeframeEnum,
+} from "@candleview/core";
 
 interface GeneratorParams {
   volatility: number;
@@ -32,75 +37,134 @@ interface MarkDataItem {
 export default function FullViewportComponent() {
   const { locale } = useI18n();
   const [isDark, setIsDark] = useState(true);
-  const [candleViewHeight, setCandleViewHeight] = useState<string | number>("100%");
   const [leftPanelWidth, setLeftPanelWidth] = useState(90);
   const [isResizing, setIsResizing] = useState(false);
   const [expandedMenus, setExpandedMenus] = useState<number[]>([1, 2, 3, 4, 5]);
-  const [uploadedCandleData, setUploadedCandleData] = useState<ICandleViewDataPoint[]>([]);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [uploadedCandleData, setUploadedCandleData] = useState<
+    ICandleViewDataPoint[]
+  >([]);
+  const mainContainerRef = useRef<HTMLDivElement>(null);
+  const chartContainerRef = useRef<HTMLDivElement>(null);
+  const candleViewRef = useRef<CandleView | null>(null);
   const startXRef = useRef(0);
   const startWidthRef = useRef(0);
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
+
   const getInitialTimes = () => {
     const now = new Date();
     const oneHourAgo = new Date(now.getTime() - 3600000);
     return {
       startTime: oneHourAgo.toISOString().slice(0, 16),
       endTime: now.toISOString().slice(0, 16),
-      nowTime: now.getTime()
+      nowTime: now.getTime(),
     };
   };
   const initialTimes = getInitialTimes();
-  const [staticMarkers, setStaticMarkers] = useState<number[]>([]);
 
   useEffect(() => {
     const checkTheme = () => {
-      const isDarkTheme = document.documentElement.classList.contains('dark');
+      const isDarkTheme = document.documentElement.classList.contains("dark");
       setIsDark(isDarkTheme);
+      if (candleViewRef.current) {
+        candleViewRef.current.setTheme(isDarkTheme ? "dark" : "light");
+      }
     };
     checkTheme();
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
-        if (mutation.attributeName === 'class') {
+        if (mutation.attributeName === "class") {
           checkTheme();
         }
       });
     });
     observer.observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ['class'],
+      attributeFilter: ["class"],
     });
     return () => {
       observer.disconnect();
     };
   }, []);
 
-  const getCandleViewI18n = () => {
-    if (locale === 'cn') {
-      return 'zh-cn';
+  useEffect(() => {
+    if (candleViewRef.current && isInitialized) {
+      candleViewRef.current.setLocale(locale === "cn" ? "zh-cn" : "en");
     }
-    return 'en';
+  }, [locale, isInitialized]);
+
+  useEffect(() => {
+  if (!chartContainerRef.current || candleViewRef.current) return;
+  const isDarkTheme = document.documentElement.classList.contains("dark");
+  const currentTheme = isDarkTheme ? "dark" : "light";
+  const candleView = new CandleView({
+    parent: chartContainerRef.current,
+    title: "Test Data",
+    data: TEST_CANDLEVIEW_DATA8,
+    theme: currentTheme,
+    locale: locale === "cn" ? "zh-cn" : "en",
+    technologyPanel: true,
+    drawingPanel: true,
+    timeframe: TimeframeEnum.FIFTEEN_MINUTES,
+  });
+  candleViewRef.current = candleView;
+  setIsInitialized(true);
+  
+  // 添加这行：初始化完成后重新设置数据
+  setTimeout(() => {
+    if (candleViewRef.current) {
+      candleViewRef.current.setData(TEST_CANDLEVIEW_DATA8);
+    }
+  }, 100);
+  
+  return () => {
+    if (candleViewRef.current) {
+      candleViewRef.current.destroy();
+      candleViewRef.current = null;
+    }
+    setIsInitialized(false);
   };
+}, []);
 
-  const startResizing = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    if (!containerRef.current) return;
-    startXRef.current = e.clientX;
-    startWidthRef.current = leftPanelWidth;
-    setIsResizing(true);
-  }, [leftPanelWidth]);
+  const updateData = useCallback(
+    (data: ICandleViewDataPoint[]) => {
+      if (candleViewRef.current && isInitialized) {
+        candleViewRef.current.setData(data);
+      }
+    },
+    [isInitialized],
+  );
 
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (!isResizing || !containerRef.current) return;
-    const containerRect = containerRef.current.getBoundingClientRect();
-    const containerWidth = containerRect.width;
-    const deltaX = e.clientX - startXRef.current;
-    const deltaPercent = (deltaX / containerWidth) * 100;
-    let newWidth = startWidthRef.current + deltaPercent;
-    newWidth = Math.max(50, newWidth);
-    newWidth = Math.min(90, newWidth);
-    setLeftPanelWidth(newWidth);
-  }, [isResizing]);
+  useEffect(() => {
+    if (uploadedCandleData.length > 0 && isInitialized) {
+      updateData(uploadedCandleData);
+    }
+  }, [uploadedCandleData, isInitialized, updateData]);
+
+  const startResizing = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      if (!mainContainerRef.current) return;
+      startXRef.current = e.clientX;
+      startWidthRef.current = leftPanelWidth;
+      setIsResizing(true);
+    },
+    [leftPanelWidth],
+  );
+
+  const handleMouseMove = useCallback(
+    (e: MouseEvent) => {
+      if (!isResizing || !mainContainerRef.current) return;
+      const containerRect = mainContainerRef.current.getBoundingClientRect();
+      const containerWidth = containerRect.width;
+      const deltaX = e.clientX - startXRef.current;
+      const deltaPercent = (deltaX / containerWidth) * 100;
+      let newWidth = startWidthRef.current + deltaPercent;
+      newWidth = Math.max(50, newWidth);
+      newWidth = Math.min(90, newWidth);
+      setLeftPanelWidth(newWidth);
+    },
+    [isResizing],
+  );
 
   const stopResizing = useCallback(() => {
     setIsResizing(false);
@@ -108,27 +172,27 @@ export default function FullViewportComponent() {
 
   useEffect(() => {
     if (isResizing) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', stopResizing);
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseup", stopResizing);
     } else {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', stopResizing);
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", stopResizing);
     }
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', stopResizing);
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", stopResizing);
     };
   }, [isResizing, handleMouseMove, stopResizing]);
 
   const toggleMenu = (index: number) => {
-    setExpandedMenus(prev =>
-      prev.includes(index)
-        ? prev.filter(i => i !== index)
-        : [...prev, index]
+    setExpandedMenus((prev) =>
+      prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index],
     );
   };
 
-  const [generatedCandleData, setGeneratedCandleData] = useState<ICandleViewDataPoint[]>([]);
+  const [generatedCandleData, setGeneratedCandleData] = useState<
+    ICandleViewDataPoint[]
+  >([]);
   const [realtimeData, setRealtimeData] = useState<ICandleViewDataPoint[]>([]);
   const [generatorParams, setGeneratorParams] = useState<GeneratorParams>({
     volatility: 5,
@@ -136,16 +200,16 @@ export default function FullViewportComponent() {
     endTime: initialTimes.endTime,
     minPrice: 100,
     maxPrice: 200,
-    trendDirection: 'random',
+    trendDirection: "random",
     gapProbability: 5,
     volumeCorrelation: 7,
     anomalyProbability: 2,
     pricePrecision: 2,
   });
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const generateOHLCVData = async () => {
     setIsGenerating(true);
-
     const {
       volatility,
       startTime,
@@ -156,14 +220,16 @@ export default function FullViewportComponent() {
       gapProbability,
       volumeCorrelation,
       anomalyProbability,
-      pricePrecision
+      pricePrecision,
     } = generatorParams;
 
     setGeneratedCandleData([]);
     setRealtimeData([]);
-    await new Promise(resolve => setTimeout(resolve, 10));
-    let start = startTime ? new Date(startTime).getTime() : Date.now() - 3600000;
-    let end = endTime ? new Date(endTime).getTime() : Date.now();
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    let start = startTime
+      ? new Date(startTime).getTime()
+      : Date.now() - 3600000;
+    const end = endTime ? new Date(endTime).getTime() : Date.now();
     if (start >= end) {
       start = end - 3600000;
     }
@@ -183,13 +249,13 @@ export default function FullViewportComponent() {
     let lastClose = basePrice;
     let trendBias = 0;
     switch (trendDirection) {
-      case 'up':
+      case "up":
         trendBias = 0.1;
         break;
-      case 'down':
+      case "down":
         trendBias = -0.1;
         break;
-      case 'sideways':
+      case "sideways":
         trendBias = 0;
         break;
       default:
@@ -202,7 +268,8 @@ export default function FullViewportComponent() {
       const priceChange = (random + trendBias + cycle) * volatilityFactor;
       let open = lastClose;
       if (Math.random() < gapFactor) {
-        const gapSize = (Math.random() * 0.02 + 0.01) * (Math.random() > 0.5 ? 1 : -1);
+        const gapSize =
+          (Math.random() * 0.02 + 0.01) * (Math.random() > 0.5 ? 1 : -1);
         open = lastClose * (1 + gapSize);
       }
       const close = open * (1 + priceChange / 100);
@@ -223,7 +290,8 @@ export default function FullViewportComponent() {
       const baseVolume = 1000 + Math.random() * 9000;
       const correlatedVolume = baseVolume * (1 + priceMove * volumeFactor);
       const volume = Math.floor(correlatedVolume);
-      const toPrecision = (num: number) => parseFloat(num.toFixed(pricePrecision));
+      const toPrecision = (num: number) =>
+        parseFloat(num.toFixed(pricePrecision));
       data.push({
         time: timestamp,
         open: toPrecision(open),
@@ -231,28 +299,107 @@ export default function FullViewportComponent() {
         low: toPrecision(low),
         close: toPrecision(clampedClose),
         volume: volume,
-        isVirtual: false
+        isVirtual: false,
       });
       lastClose = clampedClose;
       if (data.length % 1000 === 0) {
-        await new Promise(resolve => setTimeout(resolve, 0));
+        await new Promise((resolve) => setTimeout(resolve, 0));
       }
     }
     setGeneratedCandleData(data);
+    if (data.length > 0) {
+      updateData(data);
+    }
     setIsGenerating(false);
   };
 
-  const handleParamChange = (key: keyof GeneratorParams, value: string | number) => {
-    setGeneratorParams(prev => ({
+  const handleParamChange = (
+    key: keyof GeneratorParams,
+    value: string | number,
+  ) => {
+    setGeneratorParams((prev) => ({
       ...prev,
-      [key]: value
+      [key]: value,
     }));
   };
 
   const handleRealtimeDataGenerated = (data: ICandleViewDataPoint[]) => {
     setRealtimeData(data);
     if (data.length > 0) {
-      setGeneratedCandleData(data);
+      updateData(data);
+    }
+  };
+
+  const [markData, setMarkData] = useState<MarkDataItem[]>([]);
+
+  const handleMarkerAdd = (markerData: {
+    time: number;
+    type: string;
+    data: { text: string; direction: string }[];
+  }) => {
+    setMarkData((prev) => {
+      const existingIndex = prev.findIndex(
+        (item) => item.time === markerData.time,
+      );
+      if (existingIndex >= 0) {
+        const newMarkData = [...prev];
+        const existingData = newMarkData[existingIndex];
+        const mergedData = [...existingData.data];
+        markerData.data.forEach((newItem) => {
+          const exists = mergedData.some(
+            (item) =>
+              item.text === newItem.text &&
+              item.direction === newItem.direction,
+          );
+          if (!exists) {
+            mergedData.push(newItem);
+          }
+        });
+        newMarkData[existingIndex] = {
+          ...existingData,
+          data: mergedData,
+        };
+        return newMarkData;
+      } else {
+        return [...prev, markerData];
+      }
+    });
+    if (candleViewRef.current && isInitialized) {
+      markerData.data.forEach((item) => {
+        candleViewRef.current?.addTextMark(
+          markerData.time,
+          item.text,
+          item.direction === "Top"
+            ? StaticMarkDirection.Top
+            : StaticMarkDirection.Bottom,
+        );
+      });
+    }
+  };
+
+  const handleMarkerRemove = (timestamp: number) => {
+    const newMarkData = markData.filter((item) => item.time !== timestamp);
+    setMarkData(newMarkData);
+    if (candleViewRef.current && isInitialized) {
+      candleViewRef.current.clearAllStaticMarks();
+      newMarkData.forEach((marker) => {
+        marker.data.forEach((item) => {
+          candleViewRef.current?.addTextMark(
+            marker.time,
+            item.text,
+            item.direction === "Top"
+              ? StaticMarkDirection.Top
+              : StaticMarkDirection.Bottom,
+          );
+        });
+      });
+    }
+  };
+
+  const handleClearAllMarkers = () => {
+    setMarkData([]);
+    if (candleViewRef.current && isInitialized) {
+      candleViewRef.current.clearAllStaticMarks();
     }
   };
 
@@ -269,42 +416,10 @@ export default function FullViewportComponent() {
     return TEST_CANDLEVIEW_DATA8;
   };
 
-  const [markData, setMarkData] = useState<MarkDataItem[]>([]);
-
-  const handleMarkerAdd = (markerData: { time: number; type: string; data: { text: string; direction: string }[] }) => {
-    setMarkData(prev => {
-      const existingIndex = prev.findIndex(item => item.time === markerData.time);
-      if (existingIndex >= 0) {
-        const newMarkData = [...prev];
-        const existingData = newMarkData[existingIndex];
-        const mergedData = [...existingData.data];
-        markerData.data.forEach(newItem => {
-          const exists = mergedData.some(
-            item => item.text === newItem.text && item.direction === newItem.direction
-          );
-          if (!exists) {
-            mergedData.push(newItem);
-          }
-        });
-        newMarkData[existingIndex] = {
-          ...existingData,
-          data: mergedData
-        };
-        return newMarkData;
-      } else {
-        return [...prev, markerData];
-      }
-    });
-  };
-
-  const handleMarkerRemove = (timestamp: number) => {
-    setMarkData(prev => prev.filter(item => item.time !== timestamp));
-  };
-
   const menuItems = [
     {
       id: 1,
-      title: locale === 'cn' ? '模拟器' : 'Emulator',
+      title: locale === "cn" ? "模拟器" : "Emulator",
       content: (
         <Emulator
           isDark={isDark}
@@ -314,11 +429,11 @@ export default function FullViewportComponent() {
           onParamChange={handleParamChange}
           onGenerate={generateOHLCVData}
         />
-      )
+      ),
     },
     {
       id: 2,
-      title: locale === 'cn' ? '数据上传' : 'Data Upload',
+      title: locale === "cn" ? "数据上传" : "Data Upload",
       content: (
         <DataUpload
           isDark={isDark}
@@ -328,14 +443,15 @@ export default function FullViewportComponent() {
             if (data.length > 0) {
               setGeneratedCandleData(data);
               setRealtimeData([]);
+              updateData(data);
             }
           }}
         />
-      )
+      ),
     },
     {
       id: 3,
-      title: locale === 'cn' ? '远程数据' : 'Remote Data',
+      title: locale === "cn" ? "远程数据" : "Remote Data",
       content: (
         <RemoteData
           isDark={isDark}
@@ -343,24 +459,25 @@ export default function FullViewportComponent() {
           onDataLoaded={(data) => {
             setGeneratedCandleData(data);
             setRealtimeData([]);
+            updateData(data);
           }}
         />
-      )
+      ),
     },
     {
       id: 4,
-      title: locale === 'cn' ? '实时数据' : 'Realtime Data',
+      title: locale === "cn" ? "实时数据" : "Realtime Data",
       content: (
         <RealtimeData
           isDark={isDark}
           locale={locale}
           onDataGenerated={handleRealtimeDataGenerated}
         />
-      )
+      ),
     },
     {
       id: 5,
-      title: locale === 'cn' ? '静态标记' : 'Static Markers',
+      title: locale === "cn" ? "静态标记" : "Static Markers",
       content: (
         <StaticMarker
           isDark={isDark}
@@ -368,113 +485,92 @@ export default function FullViewportComponent() {
           chartData={getDisplayData()}
           onMarkerAdd={handleMarkerAdd}
           onMarkerRemove={handleMarkerRemove}
-          onClearAllMarkers={() => {
-            setMarkData([]);
-          }}
+          onClearAllMarkers={handleClearAllMarkers}
         />
-      )
+      ),
     },
   ];
 
   const getDividerHandleColor = () => {
     return isDark
-      ? 'bg-gray-600 group-hover:bg-blue-600'
-      : 'bg-gray-400 group-hover:bg-blue-500';
+      ? "bg-gray-600 group-hover:bg-blue-600"
+      : "bg-gray-400 group-hover:bg-blue-500";
   };
 
   return (
-    <div
-      ref={containerRef}
-      className="fixed inset-0 overflow-hidden"
-    >
+    <div ref={mainContainerRef} className="fixed inset-0 overflow-hidden">
       <div className="w-full h-full flex">
         <div
           className="h-full overflow-hidden"
           style={{
             width: `${leftPanelWidth}%`,
-            minWidth: '50%',
-            maxWidth: '90%'
+            minWidth: "50%",
+            maxWidth: "90%",
+             position: "relative", 
           }}
         >
-          <CandleView
-            data={getDisplayData()}
-            title={realtimeData.length > 0 ?
-              locale === 'en' ? 'Real Time Data' : '实时数据' :
-              locale === 'en' ? 'Test Data' : '测试数据'}
-            theme={isDark ? 'dark' : 'light'}
-            i18n={getCandleViewI18n()}
-            height={candleViewHeight}
-            leftpanel={true}
-            timeframe='1s'
-            toppanel={true}
-            markData={markData}
-            ai={true}
-            aiconfigs={[
-              {
-                proxyUrl: '/api',
-                brand: 'aliyun',
-                model: 'qwen-turbo',
-              },
-              {
-                proxyUrl: '/api',
-                brand: 'deepseek',
-                model: 'deepseek-chat',
-              },
-            ]}
-          />
+          <div ref={chartContainerRef} className="w-full h-full" />
         </div>
         <div
-          className={`w-2 h-full cursor-col-resize relative group transition-colors duration-200 ${isDark ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-300 hover:bg-gray-400'}`}
+          className={`w-2 h-full cursor-col-resize relative group transition-colors duration-200 ${isDark ? "bg-gray-700 hover:bg-gray-600" : "bg-gray-300 hover:bg-gray-400"}`}
           onMouseDown={startResizing}
         >
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className={`w-1 h-8 rounded transition-colors duration-200 ${getDividerHandleColor()}`}></div>
+            <div
+              className={`w-1 h-8 rounded transition-colors duration-200 ${getDividerHandleColor()}`}
+            ></div>
           </div>
         </div>
         <div
           className="h-full overflow-hidden flex flex-col"
           style={{
             width: `${100 - leftPanelWidth}%`,
-            minWidth: '20%'
+            minWidth: "20%",
           }}
         >
           <div className="flex-1 overflow-hidden relative">
-            <div className={`absolute inset-0 overflow-y-auto ${isDark ? 'scrollbar-dark' : 'scrollbar-light'}`}>
+            <div
+              className={`absolute inset-0 overflow-y-auto ${isDark ? "scrollbar-dark" : "scrollbar-light"}`}
+            >
               <div className="p-0">
                 <div className="space-y-0">
                   {menuItems.map((item) => (
                     <div
                       key={item.id}
-                      className={`overflow-hidden transition-all duration-300 ${isDark ? 'bg-gray-800' : 'bg-gray-50'}`}
+                      className={`overflow-hidden transition-all duration-300 ${isDark ? "bg-gray-800" : "bg-gray-50"}`}
                     >
                       <div
-                        className={`px-3 py-2 flex justify-between items-center cursor-pointer transition-colors duration-200 ${isDark
-                          ? 'hover:bg-gray-700 active:bg-gray-600 border-gray-700'
-                          : 'hover:bg-gray-200 active:bg-gray-300 border-gray-300'
-                          } border-b `}
+                        className={`px-3 py-2 flex justify-between items-center cursor-pointer transition-colors duration-200 ${
+                          isDark
+                            ? "hover:bg-gray-700 active:bg-gray-600 border-gray-700"
+                            : "hover:bg-gray-200 active:bg-gray-300 border-gray-300"
+                        } border-b `}
                         onClick={() => toggleMenu(item.id)}
                       >
-                        <span className={`text-base font-medium ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>
+                        <span
+                          className={`text-base font-medium ${isDark ? "text-gray-200" : "text-gray-800"}`}
+                        >
                           {item.title}
                         </span>
                         <svg
-                          className={`w-4 h-4 transition-transform duration-300 ${expandedMenus.includes(item.id) ? 'rotate-180' : ''
-                            } ${isDark ? 'text-gray-400' : 'text-gray-600'}`}
+                          className={`w-4 h-4 transition-transform duration-300 ${
+                            expandedMenus.includes(item.id) ? "rotate-180" : ""
+                          } ${isDark ? "text-gray-400" : "text-gray-600"}`}
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
                         >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 9l-7 7-7-7"
+                          />
                         </svg>
                       </div>
                       {expandedMenus.includes(item.id) && (
-                        <div
-                          className="px-3 transition-all duration-300 ease-in-out"
-                        >
-                          <div className={`h-full flex items-center justify-center transition-colors duration-300 ${isDark ? 'border-gray-700 text-gray-400' : 'border-gray-300 text-gray-600'
-                            }`}>
-                            <p className="text-sm">{item.content}</p>
-                          </div>
+                        <div className="px-3 transition-all duration-300 ease-in-out">
+                          {item.content}
                         </div>
                       )}
                     </div>
@@ -563,7 +659,8 @@ export default function FullViewportComponent() {
             scrollbar-color: #4a5568 #1a202c;
           }
         }
-        .scrollbar-light, .scrollbar-dark {
+        .scrollbar-light,
+        .scrollbar-dark {
           scroll-behavior: smooth;
           -webkit-overflow-scrolling: touch;
         }

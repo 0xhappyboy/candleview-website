@@ -1,4 +1,4 @@
-import AIDialog from "./components/AIDialog";
+// page.tsx (main home page)
 import ChartShowcase from "./components/ChartShowcase";
 import Features from "./components/Features";
 import Footer from "./components/Footer";
@@ -20,29 +20,28 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background">
       <Header />
-      <div id="hero">
-        <Hero />
-      </div>
-      <div id="preview">
-        <Preview />
-      </div>
-      <div id="ai-dialog">
-        <AIDialog />
-      </div>
-      <div id="features">
-        <Features />
-      </div>
-      <div id="chart">
-        <ChartShowcase />
-      </div>
-      <div id="time">
-        <TimeShowcase />
-      </div>
-      <div id="footer">
-        <Footer />
-      </div>
+      <main>
+        <div id="hero">
+          <Hero />
+        </div>
+        <div id="preview">
+          <Preview />
+        </div>
+        <div id="features">
+          <Features />
+        </div>
+        <div id="chart">
+          <ChartShowcase />
+        </div>
+        <div id="time">
+          <TimeShowcase />
+        </div>
+        <div id="footer">
+          <Footer />
+        </div>
+      </main>
       <FloatingNav sections={sections} />
     </div>
   );

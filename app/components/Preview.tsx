@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { siteConfig } from '../config';
-import { useI18n } from '../providers/I18nProvider';
-import { TEST_CANDLEVIEW_DATA8 } from '../mock/mock_data_1';
-import CandleView from 'candleview';
+import { useEffect, useRef, useState } from "react";
+import { siteConfig } from "../config";
+import { useI18n } from "../providers/I18nProvider";
+import { TEST_CANDLEVIEW_DATA8 } from "../mock/mock_data_1";
+import { CandleView, TimeframeEnum } from "@candleview/core";
 
 interface LocalizableContent {
   en: string;
@@ -14,14 +14,17 @@ interface LocalizableContent {
 
 type LocalizableConfig = string | LocalizableContent;
 
-const getLocalizedContent = (config: LocalizableConfig, locale: string): string => {
-  if (typeof config === 'object') {
+const getLocalizedContent = (
+  config: LocalizableConfig,
+  locale: string,
+): string => {
+  if (typeof config === "object") {
     const obj = config as Record<string, string>;
     if (obj[locale]) {
       return obj[locale];
     }
-    if (obj['en']) {
-      return obj['en'];
+    if (obj["en"]) {
+      return obj["en"];
     }
   }
   return config as string;
@@ -48,79 +51,113 @@ const renderHighlightedTitle = (title: string, highlight: string) => {
 
 export default function Preview() {
   const { locale } = useI18n();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const candleViewRef = useRef<CandleView | null>(null);
   const [isDark, setIsDark] = useState(true);
+  const [isInitialized, setIsInitialized] = useState(false);
+
   const preview = siteConfig.preview;
   const localizedTitleMain = getLocalizedContent(preview.title.main, locale);
-  const localizedTitleHighlight = getLocalizedContent(preview.title.highlight, locale);
-  const localizedSubtitleText = getLocalizedContent(preview.subtitle.text, locale);
+  const localizedTitleHighlight = getLocalizedContent(
+    preview.title.highlight,
+    locale,
+  );
+  const localizedSubtitleText = getLocalizedContent(
+    preview.subtitle.text,
+    locale,
+  );
 
   useEffect(() => {
+    if (!containerRef.current || candleViewRef.current) return;
+    const isDarkTheme = document.documentElement.classList.contains("dark");
+    const currentTheme = isDarkTheme ? "dark" : "light";
+    const candleView = new CandleView({
+      parent: containerRef.current,
+      title: "Test",
+      data: TEST_CANDLEVIEW_DATA8,
+      theme: currentTheme,
+      locale: locale === "cn" ? "zh-cn" : "en",
+      technologyPanel: true,
+      drawingPanel: true,
+      timeframe: TimeframeEnum.ONE_SECOND,
+    });
+    candleViewRef.current = candleView;
+    setIsInitialized(true);
+    return () => {
+      if (candleViewRef.current) {
+        candleViewRef.current.destroy();
+        candleViewRef.current = null;
+      }
+      setIsInitialized(false);
+    };
+  }, []);
+  useEffect(() => {
     const checkTheme = () => {
-      const isDarkTheme = document.documentElement.classList.contains('dark');
+      const isDarkTheme = document.documentElement.classList.contains("dark");
       setIsDark(isDarkTheme);
+      if (candleViewRef.current) {
+        candleViewRef.current.setTheme(isDarkTheme ? "dark" : "light");
+      }
     };
     checkTheme();
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
-        if (mutation.attributeName === 'class') {
+        if (mutation.attributeName === "class") {
           checkTheme();
         }
       });
     });
+
     observer.observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ['class'],
+      attributeFilter: ["class"],
     });
+
     return () => {
       observer.disconnect();
     };
   }, []);
-
-  const getCandleViewI18n = () => {
-    if (locale === 'cn') {
-      return 'zh-cn';
+  useEffect(() => {
+    if (candleViewRef.current && isInitialized) {
+      candleViewRef.current.setLocale(locale === "cn" ? "zh-cn" : "en");
     }
-    return 'en';
-  };
-
+  }, [locale, isInitialized]);
+  useEffect(() => {
+    if (candleViewRef.current && isInitialized) {
+      candleViewRef.current.setData(TEST_CANDLEVIEW_DATA8);
+    }
+  }, [isInitialized]);
   return (
-    <section className={preview.container.className}>
-      <h2 className={preview.title.className}>
-        {renderHighlightedTitle(localizedTitleMain, localizedTitleHighlight)}
-      </h2>
-      <p className={preview.subtitle.className}>
-        {localizedSubtitleText}
-      </p>
-      <div className={preview.previewArea.className}>
-        <CandleView
-          data={TEST_CANDLEVIEW_DATA8}
-          title='Test'
-          theme={isDark ? 'dark' : 'light'}
-          i18n={getCandleViewI18n()}
-          height={600}
-          leftpanel={true}
-          toppanel={true}
-          terminal={true}
-          timeframe='1s'
-          ai={true}
-          aiconfigs={[
-            {
-              proxyUrl: '/api',
-              brand: 'aliyun',
-              model: 'qwen-turbo',
-            },
-            {
-              proxyUrl: '/api',
-              brand: 'deepseek',
-              model: 'deepseek-chat',
-            },
-          ]}
-        />
+    <section className="py-12">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-2xl text-center">
+          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl text-foreground">
+            {renderHighlightedTitle(
+              localizedTitleMain,
+              localizedTitleHighlight,
+            )}
+          </h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            {localizedSubtitleText}
+          </p>
+        </div>
+        <div className="mt-8 rounded-lg border border-border bg-muted/30 p-1">
+          <div
+            ref={containerRef}
+            className="w-full"
+            style={{ height: "600px" }}
+          />
+        </div>
       </div>
       <style jsx global>{`
         @keyframes gradient {
-          0%, 100% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
+          0%,
+          100% {
+            background-position: 0% 50%;
+          }
+          50% {
+            background-position: 100% 50%;
+          }
         }
         .animate-gradient {
           animation: gradient 3s ease-in-out infinite;

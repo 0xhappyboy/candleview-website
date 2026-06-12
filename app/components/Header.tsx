@@ -46,42 +46,42 @@ export default function Header() {
   const siteName = t('SiteName.name');
 
   return (
-    <header className={siteConfig.header.className}>
+    <header className="sticky top-0 z-50 bg-background/90 backdrop-blur-md border-b border-border">
       <div className={siteConfig.container.className}>
-        <div className={`flex ${siteConfig.header.height} items-center justify-between`}>
-          <Link href="/" className="flex items-center gap-2">
-            <div className={`${siteConfig.logo.iconSize} rounded-lg overflow-hidden flex items-center justify-center`}>
+        <div className="flex h-12 items-center justify-between">
+          <Link href="/" className="flex items-center gap-1.5">
+            <div className="h-6 w-6 rounded overflow-hidden flex items-center justify-center">
               <img
                 src={siteConfig.logo.imageUrl}
                 alt={siteName}
                 className="w-full h-full object-cover"
               />
             </div>
-            <span className={`${siteConfig.logo.textSize} font-bold tracking-tight`}>
+            <span className="text-sm font-bold tracking-tight text-foreground">
               {siteName}
             </span>
           </Link>
-          <nav className={`hidden md:flex items-center ${siteConfig.navigation.desktop.gap} ml-auto mr-6`}>
+          <nav className="hidden md:flex items-center gap-4 ml-auto mr-4">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 target="_blank"
-                className={`${siteConfig.navigation.desktop.className} ${pathname === item.href
-                  ? siteConfig.navigation.desktop.activeClass
-                  : siteConfig.navigation.desktop.inactiveClass
+                className={`text-[11px] font-medium transition-colors ${pathname === item.href
+                  ? 'text-primary'
+                  : 'text-muted-foreground hover:text-foreground'
                   }`}
               >
                 {item.label}
               </Link>
             ))}
           </nav>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             <div className="flex items-center gap-1">
               <LanguageSwitcher />
               <ThemeToggle />
-              <div className={siteConfig.separator.className} />
-              <div className={`hidden sm:flex items-center ${siteConfig.controls.desktop.gap}`}>
+              <div className="w-px h-4 bg-border mx-1" />
+              <div className="hidden sm:flex items-center gap-1">
                 {siteConfig.socialLinks.map((social) => {
                   const IconComponent = iconComponents[social.component];
                   return (
@@ -90,10 +90,10 @@ export default function Header() {
                       href={social.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={siteConfig.controls.desktop.buttonClass}
+                      className="p-1.5 rounded-md hover:bg-muted transition-colors"
                       aria-label={social.label}
                     >
-                      <div className={`${siteConfig.controls.desktop.buttonSize} ${social.sizeAdjustment || ''} ${siteConfig.controls.desktop.iconClass}`}>
+                      <div className="h-3.5 w-3.5 text-muted-foreground hover:text-foreground transition-colors">
                         <IconComponent className="w-full h-full" />
                       </div>
                     </a>
@@ -103,35 +103,32 @@ export default function Header() {
             </div>
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className={`md:hidden ${siteConfig.controls.mobile.buttonPadding} ${siteConfig.controls.mobile.buttonClass}`}
+              className="md:hidden p-1.5 rounded-md hover:bg-muted transition-colors"
               aria-label="Toggle menu"
             >
               {isMenuOpen ? (
-                <CloseIcon className={siteConfig.controls.mobile.buttonSize} />
+                <CloseIcon className="h-4 w-4" />
               ) : (
-                <Menu className={siteConfig.controls.mobile.buttonSize} />
+                <Menu className="h-4 w-4" />
               )}
             </button>
           </div>
         </div>
         {isMenuOpen && (
-          <div className="md:hidden border-t">
-            <div className="py-3 space-y-1">
+          <div className="md:hidden border-t border-border mt-2 pt-2">
+            <div className="py-2 space-y-1">
               {navItems.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`block px-4 py-2 text-sm font-medium rounded-md transition-colors ${pathname === item.href
-                    ? siteConfig.navigation.mobile.activeClass
-                    : siteConfig.navigation.mobile.inactiveClass
-                    }`}
+                  className="block px-3 py-1.5 text-[11px] font-medium rounded-md transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {item.label}
                 </Link>
               ))}
-              <div className="px-4 py-3 border-t">
-                <div className="flex justify-center gap-3">
+              <div className="px-3 py-2 border-t border-border mt-1">
+                <div className="flex justify-center gap-2">
                   {siteConfig.socialLinks.map((social) => {
                     const IconComponent = iconComponents[social.component];
                     return (
@@ -140,11 +137,11 @@ export default function Header() {
                         href={social.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="p-1.5 rounded-md transition-colors flex items-center justify-center"
+                        className="p-1.5 rounded-md hover:bg-muted transition-colors"
                         aria-label={social.label}
                         onClick={() => setIsMenuOpen(false)}
                       >
-                        <div className={`h-4 w-4 ${social.sizeAdjustment || ''} text-foreground/60 hover:text-foreground transition-colors`}>
+                        <div className="h-3.5 w-3.5 text-muted-foreground hover:text-foreground transition-colors">
                           <IconComponent className="w-full h-full" />
                         </div>
                       </a>

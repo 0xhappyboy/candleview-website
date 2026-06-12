@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useEffect, useState, useRef, useCallback } from 'react';
-import { TEST_CANDLEVIEW_DATA8 } from '../mock/mock_data_1';
-import { useI18n } from '../providers/I18nProvider';
-import CandleView, { ICandleViewDataPoint } from 'candleview';
-import Cryptos from './Cryptos';
-import Stocks from './Stocks';
+import { useEffect, useState, useRef, useCallback } from "react";
+import { TEST_CANDLEVIEW_DATA8 } from "../mock/mock_data_1";
+import { useI18n } from "../providers/I18nProvider";
+import Cryptos from "./Cryptos";
+import Stocks from "./Stocks";
+import { CandleView, ICandleViewDataPoint } from "@candleview/core";
 
 interface YahooFinanceChartResult {
   meta: {
@@ -178,195 +178,244 @@ interface BinanceKlineData {
 }
 
 const BINANCE_INTERVAL_MAP: Record<string, string> = {
-  '1s': '1s',
-  '5s': '5s',
-  '15s': '15s',
-  '30s': '30s',
-  '1m': '1m',
-  '3m': '3m',
-  '5m': '5m',
-  '15m': '15m',
-  '30m': '30m',
-  '45m': '45m',
-  '1H': '1h',
-  '2H': '2h',
-  '3H': '3h',
-  '4H': '4h',
-  '6H': '6h',
-  '8H': '8h',
-  '12H': '12h',
-  '1D': '1d',
-  '3D': '3d',
-  '1W': '1w',
-  '2W': '2w',
-  '1M': '1M',
-  '3M': '3M',
-  '6M': '6M'
+  "1s": "1s",
+  "5s": "5s",
+  "15s": "15s",
+  "30s": "30s",
+  "1m": "1m",
+  "3m": "3m",
+  "5m": "5m",
+  "15m": "15m",
+  "30m": "30m",
+  "45m": "45m",
+  "1H": "1h",
+  "2H": "2h",
+  "3H": "3h",
+  "4H": "4h",
+  "6H": "6h",
+  "8H": "8h",
+  "12H": "12h",
+  "1D": "1d",
+  "3D": "3d",
+  "1W": "1w",
+  "2W": "2w",
+  "1M": "1M",
+  "3M": "3M",
+  "6M": "6M",
 };
 
-const TIMEFRAME_CONFIGS: Record<string, {
-  totalCandles: number,
-  limit: number,
-  description: (locale: string) => string
-}> = {
-  '1s': {
+const TIMEFRAME_CONFIGS: Record<
+  string,
+  {
+    totalCandles: number;
+    limit: number;
+    description: (locale: string) => string;
+  }
+> = {
+  "1s": {
     totalCandles: 5000,
     limit: 1000,
-    description: (locale: string) => locale === 'cn' ? '1秒 - 5,000条' : '1s - 5,000 candles'
+    description: (locale: string) =>
+      locale === "cn" ? "1秒 - 5,000条" : "1s - 5,000 candles",
   },
-  '5s': {
+  "5s": {
     totalCandles: 5000,
     limit: 1000,
-    description: (locale: string) => locale === 'cn' ? '5秒 - 5,000条' : '5s - 5,000 candles'
+    description: (locale: string) =>
+      locale === "cn" ? "5秒 - 5,000条" : "5s - 5,000 candles",
   },
-  '15s': {
+  "15s": {
     totalCandles: 5000,
     limit: 1000,
-    description: (locale: string) => locale === 'cn' ? '15秒 - 5,000条' : '15s - 5,000 candles'
+    description: (locale: string) =>
+      locale === "cn" ? "15秒 - 5,000条" : "15s - 5,000 candles",
   },
-  '30s': {
+  "30s": {
     totalCandles: 5000,
     limit: 1000,
-    description: (locale: string) => locale === 'cn' ? '30秒 - 5,000条' : '30s - 5,000 candles'
+    description: (locale: string) =>
+      locale === "cn" ? "30秒 - 5,000条" : "30s - 5,000 candles",
   },
-  '1m': {
+  "1m": {
     totalCandles: 5000,
     limit: 1000,
-    description: (locale: string) => locale === 'cn' ? '1分钟 - 5,000条' : '1m - 5,000 candles'
+    description: (locale: string) =>
+      locale === "cn" ? "1分钟 - 5,000条" : "1m - 5,000 candles",
   },
-  '3m': {
+  "3m": {
     totalCandles: 5000,
     limit: 1000,
-    description: (locale: string) => locale === 'cn' ? '3分钟 - 5,000条' : '3m - 5,000 candles'
+    description: (locale: string) =>
+      locale === "cn" ? "3分钟 - 5,000条" : "3m - 5,000 candles",
   },
-  '5m': {
+  "5m": {
     totalCandles: 5000,
     limit: 1000,
-    description: (locale: string) => locale === 'cn' ? '5分钟 - 5,000条' : '5m - 5,000 candles'
+    description: (locale: string) =>
+      locale === "cn" ? "5分钟 - 5,000条" : "5m - 5,000 candles",
   },
-  '15m': {
+  "15m": {
     totalCandles: 5000,
     limit: 1000,
-    description: (locale: string) => locale === 'cn' ? '15分钟 - 5,000条' : '15m - 5,000 candles'
+    description: (locale: string) =>
+      locale === "cn" ? "15分钟 - 5,000条" : "15m - 5,000 candles",
   },
-  '30m': {
+  "30m": {
     totalCandles: 5000,
     limit: 1000,
-    description: (locale: string) => locale === 'cn' ? '30分钟 - 5,000条' : '30m - 5,000 candles'
+    description: (locale: string) =>
+      locale === "cn" ? "30分钟 - 5,000条" : "30m - 5,000 candles",
   },
-  '45m': {
+  "45m": {
     totalCandles: 5000,
     limit: 1000,
-    description: (locale: string) => locale === 'cn' ? '45分钟 - 5,000条' : '45m - 5,000 candles'
+    description: (locale: string) =>
+      locale === "cn" ? "45分钟 - 5,000条" : "45m - 5,000 candles",
   },
-  '1H': {
+  "1H": {
     totalCandles: 4000,
     limit: 1000,
-    description: (locale: string) => locale === 'cn' ? '1小时 - 4,000条' : '1H - 4,000 candles'
+    description: (locale: string) =>
+      locale === "cn" ? "1小时 - 4,000条" : "1H - 4,000 candles",
   },
-  '2H': {
+  "2H": {
     totalCandles: 3000,
     limit: 1000,
-    description: (locale: string) => locale === 'cn' ? '2小时 - 3,000条' : '2H - 3,000 candles'
+    description: (locale: string) =>
+      locale === "cn" ? "2小时 - 3,000条" : "2H - 3,000 candles",
   },
-  '3H': {
+  "3H": {
     totalCandles: 2000,
     limit: 1000,
-    description: (locale: string) => locale === 'cn' ? '3小时 - 2,000条' : '3H - 2,000 candles'
+    description: (locale: string) =>
+      locale === "cn" ? "3小时 - 2,000条" : "3H - 2,000 candles",
   },
-  '4H': {
+  "4H": {
     totalCandles: 2000,
     limit: 1000,
-    description: (locale: string) => locale === 'cn' ? '4小时 - 2,000条' : '4H - 2,000 candles'
+    description: (locale: string) =>
+      locale === "cn" ? "4小时 - 2,000条" : "4H - 2,000 candles",
   },
-  '6H': {
+  "6H": {
     totalCandles: 2000,
     limit: 1000,
-    description: (locale: string) => locale === 'cn' ? '6小时 - 2,000条' : '6H - 2,000 candles'
+    description: (locale: string) =>
+      locale === "cn" ? "6小时 - 2,000条" : "6H - 2,000 candles",
   },
-  '8H': {
+  "8H": {
     totalCandles: 2000,
     limit: 1000,
-    description: (locale: string) => locale === 'cn' ? '8小时 - 2,000条' : '8H - 2,000 candles'
+    description: (locale: string) =>
+      locale === "cn" ? "8小时 - 2,000条" : "8H - 2,000 candles",
   },
-  '12H': {
+  "12H": {
     totalCandles: 2000,
     limit: 1000,
-    description: (locale: string) => locale === 'cn' ? '12小时 - 2,000条' : '12H - 2,000 candles'
+    description: (locale: string) =>
+      locale === "cn" ? "12小时 - 2,000条" : "12H - 2,000 candles",
   },
-  '1D': {
+  "1D": {
     totalCandles: 1000,
     limit: 1000,
-    description: (locale: string) => locale === 'cn' ? '1日 - 1,000条 (约2.7年)' : '1D - 1,000 candles (~2.7 years)'
+    description: (locale: string) =>
+      locale === "cn"
+        ? "1日 - 1,000条 (约2.7年)"
+        : "1D - 1,000 candles (~2.7 years)",
   },
-  '3D': {
+  "3D": {
     totalCandles: 800,
     limit: 500,
-    description: (locale: string) => locale === 'cn' ? '3日 - 800条 (约6.6年)' : '3D - 800 candles (~6.6 years)'
+    description: (locale: string) =>
+      locale === "cn"
+        ? "3日 - 800条 (约6.6年)"
+        : "3D - 800 candles (~6.6 years)",
   },
-  '1W': {
+  "1W": {
     totalCandles: 500,
     limit: 500,
-    description: (locale: string) => locale === 'cn' ? '1周 - 500条 (约9.6年)' : '1W - 500 candles (~9.6 years)'
+    description: (locale: string) =>
+      locale === "cn"
+        ? "1周 - 500条 (约9.6年)"
+        : "1W - 500 candles (~9.6 years)",
   },
-  '2W': {
+  "2W": {
     totalCandles: 400,
     limit: 400,
-    description: (locale: string) => locale === 'cn' ? '2周 - 400条 (约15.4年)' : '2W - 400 candles (~15.4 years)'
+    description: (locale: string) =>
+      locale === "cn"
+        ? "2周 - 400条 (约15.4年)"
+        : "2W - 400 candles (~15.4 years)",
   },
-  '1M': {
+  "1M": {
     totalCandles: 300,
     limit: 300,
-    description: (locale: string) => locale === 'cn' ? '1月 - 300条 (约25年)' : '1M - 300 candles (~25 years)'
+    description: (locale: string) =>
+      locale === "cn" ? "1月 - 300条 (约25年)" : "1M - 300 candles (~25 years)",
   },
-  '3M': {
+  "3M": {
     totalCandles: 200,
     limit: 200,
-    description: (locale: string) => locale === 'cn' ? '3月 - 200条 (约50年)' : '3M - 200 candles (~50 years)'
+    description: (locale: string) =>
+      locale === "cn" ? "3月 - 200条 (约50年)" : "3M - 200 candles (~50 years)",
   },
-  '6M': {
+  "6M": {
     totalCandles: 100,
     limit: 100,
-    description: (locale: string) => locale === 'cn' ? '6月 - 100条 (约50年)' : '6M - 100 candles (~50 years)'
-  }
+    description: (locale: string) =>
+      locale === "cn" ? "6月 - 100条 (约50年)" : "6M - 100 candles (~50 years)",
+  },
 };
 
 export default function FullViewportComponent() {
   const { locale } = useI18n();
   const [isDark, setIsDark] = useState(true);
-  const [candleViewHeight, setCandleViewHeight] = useState<string | number>("100%");
+  const [candleViewHeight, setCandleViewHeight] = useState<string | number>(
+    "100%",
+  );
   const [leftPanelWidth, setLeftPanelWidth] = useState(90);
   const [isResizing, setIsResizing] = useState(false);
   const [expandedMenus, setExpandedMenus] = useState<number[]>([1, 2, 3, 4, 5]);
+
   const containerRef = useRef<HTMLDivElement>(null);
+  const candleViewRef = useRef<CandleView | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
+
   const startXRef = useRef(0);
   const startWidthRef = useRef(0);
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [cryptoList, setCryptoList] = useState<CryptoItem[]>([]);
-  const [filteredCryptoList, setFilteredCryptoList] = useState<CryptoItem[]>([]);
-  const [displayedCryptoList, setDisplayedCryptoList] = useState<CryptoItem[]>([]);
+  const [filteredCryptoList, setFilteredCryptoList] = useState<CryptoItem[]>(
+    [],
+  );
+  const [displayedCryptoList, setDisplayedCryptoList] = useState<CryptoItem[]>(
+    [],
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState<'volume' | 'change'>('volume');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortBy, setSortBy] = useState<"volume" | "change">("volume");
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [wsConnected, setWsConnected] = useState(false);
   const [displayCount, setDisplayCount] = useState(50);
   const [hasMore, setHasMore] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [candleData, setCandleData] = useState<ICandleViewDataPoint[]>(TEST_CANDLEVIEW_DATA8);
-  const [selectedPair, setSelectedPair] = useState<string>('');
+  const [candleData, setCandleData] = useState<ICandleViewDataPoint[]>(
+    TEST_CANDLEVIEW_DATA8,
+  );
+  const [selectedPair, setSelectedPair] = useState<string>("");
   const [isLoadingCandleData, setIsLoadingCandleData] = useState(false);
   const [candleDataError, setCandleDataError] = useState<string | null>(null);
   const [progress, setProgress] = useState<number>(0);
-  const [currentTimeframe, setCurrentTimeframe] = useState<string>('1m');
+  const [currentTimeframe, setCurrentTimeframe] = useState<string>("1m");
   // stocks
   const [stockList, setStockList] = useState<StockItem[]>([]);
   const [filteredStockList, setFilteredStockList] = useState<StockItem[]>([]);
   const [displayedStockList, setDisplayedStockList] = useState<StockItem[]>([]);
-  const [stockSearchTerm, setStockSearchTerm] = useState('');
-  const [stockSortBy, setStockSortBy] = useState<'volume' | 'change' | 'marketCap'>('volume');
+  const [stockSearchTerm, setStockSearchTerm] = useState("");
+  const [stockSortBy, setStockSortBy] = useState<
+    "volume" | "change" | "marketCap"
+  >("volume");
   const [stockDisplayCount, setStockDisplayCount] = useState(50);
   const [stockHasMore, setStockHasMore] = useState(true);
   const [isLoadingStocks, setIsLoadingStocks] = useState(false);
@@ -374,20 +423,38 @@ export default function FullViewportComponent() {
   const [stockError, setStockError] = useState<string | null>(null);
   const [currentStockApiIndex, setCurrentStockApiIndex] = useState(0);
   const [popularStocks, setPopularStocks] = useState<string[]>([
-    'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META', 'TSLA', 'NVDA', 'BRK-B', 'JPM', 'V',
-    'JNJ', 'WMT', 'UNH', 'PG', 'MA', 'HD', 'CVX', 'BAC', 'XOM', 'PFE'
+    "AAPL",
+    "MSFT",
+    "GOOGL",
+    "AMZN",
+    "META",
+    "TSLA",
+    "NVDA",
+    "BRK-B",
+    "JPM",
+    "V",
+    "JNJ",
+    "WMT",
+    "UNH",
+    "PG",
+    "MA",
+    "HD",
+    "CVX",
+    "BAC",
+    "XOM",
+    "PFE",
   ]);
-  const [candleViewTimeframe, setCandleViewTimeframe] = useState<string>('15m');
+  const [candleViewTimeframe, setCandleViewTimeframe] = useState<string>("15m");
 
   const STOCK_APIS = [
     {
-      name: 'yfinance',
-      baseUrl: 'https://query1.finance.yahoo.com',
+      name: "yfinance",
+      baseUrl: "https://query1.finance.yahoo.com",
       endpoints: {
-        chart: '/v8/finance/chart',
-        quoteSummary: '/v10/finance/quoteSummary'
-      }
-    }
+        chart: "/v8/finance/chart",
+        quoteSummary: "/v10/finance/quoteSummary",
+      },
+    },
   ];
 
   const fetchStockData = async () => {
@@ -405,10 +472,9 @@ export default function FullViewportComponent() {
             successfulStocks.push(stockData);
           }
           if (i < Math.min(popularStocks.length, maxStocks) - 1) {
-            await new Promise(resolve => setTimeout(resolve, 500));
+            await new Promise((resolve) => setTimeout(resolve, 500));
           }
-        } catch (err) {
-        }
+        } catch (err) {}
       }
       if (successfulStocks.length === 0) {
         const fallbackStocks = createFallbackStockData();
@@ -417,10 +483,9 @@ export default function FullViewportComponent() {
         updateStockState(successfulStocks);
       }
     } catch (err) {
-      setStockError('Failed to retrieve stock data, please try again later.');
+      setStockError("Failed to retrieve stock data, please try again later.");
       const fallbackStocks = createFallbackStockData();
       updateStockState(fallbackStocks);
-
     } finally {
       setIsLoadingStocks(false);
       setIsRefreshingStocks(false);
@@ -430,10 +495,12 @@ export default function FullViewportComponent() {
   const updateStockState = (stocks: StockItem[]) => {
     setStockList(stocks);
     let sorted = [...stocks];
-    if (stockSortBy === 'volume') {
+    if (stockSortBy === "volume") {
       sorted.sort((a, b) => b.volume - a.volume);
-    } else if (stockSortBy === 'change') {
-      sorted.sort((a, b) => Math.abs(b.changePercent) - Math.abs(a.changePercent));
+    } else if (stockSortBy === "change") {
+      sorted.sort(
+        (a, b) => Math.abs(b.changePercent) - Math.abs(a.changePercent),
+      );
     } else {
       sorted.sort((a, b) => (b.marketCap || 0) - (a.marketCap || 0));
     }
@@ -443,20 +510,26 @@ export default function FullViewportComponent() {
   };
 
   // Yahoo Finance API
-  const fetchStockFromYahoo = async (symbol: string): Promise<StockItem | null> => {
+  const fetchStockFromYahoo = async (
+    symbol: string,
+  ): Promise<StockItem | null> => {
     try {
       const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=1d&interval=1m`;
       const response = await fetch(url, {
         headers: {
-          'Accept': 'application/json',
-          'User-Agent': 'Mozilla/5.0'
-        }
+          Accept: "application/json",
+          "User-Agent": "Mozilla/5.0",
+        },
       });
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
       }
       const data: YahooFinanceResponse = await response.json();
-      if (data.chart.error || !data.chart.result || data.chart.result.length === 0) {
+      if (
+        data.chart.error ||
+        !data.chart.result ||
+        data.chart.result.length === 0
+      ) {
         return null;
       }
       const result = data.chart.result[0];
@@ -464,21 +537,24 @@ export default function FullViewportComponent() {
       const indicators = result.indicators;
       const quote = indicators.quote[0];
       const currentPrice = meta.regularMarketPrice;
-      const previousClose = meta.regularMarketPreviousClose || meta.chartPreviousClose || currentPrice * 0.99;
+      const previousClose =
+        meta.regularMarketPreviousClose ||
+        meta.chartPreviousClose ||
+        currentPrice * 0.99;
       const changeAmount = currentPrice - previousClose;
       const changePercent = (changeAmount / previousClose) * 100;
-      const closeValues = quote.close.filter(v => v !== null) as number[];
-      const openValues = quote.open.filter(v => v !== null) as number[];
-      const highValues = quote.high.filter(v => v !== null) as number[];
-      const lowValues = quote.low.filter(v => v !== null) as number[];
-      const volumeValues = quote.volume.filter(v => v !== null) as number[];
+      const closeValues = quote.close.filter((v) => v !== null) as number[];
+      const openValues = quote.open.filter((v) => v !== null) as number[];
+      const highValues = quote.high.filter((v) => v !== null) as number[];
+      const lowValues = quote.low.filter((v) => v !== null) as number[];
+      const volumeValues = quote.volume.filter((v) => v !== null) as number[];
       const ohlcvData = {
         timestamp: result.timestamp.slice(0, closeValues.length),
         open: openValues,
         high: highValues,
         low: lowValues,
         close: closeValues,
-        volume: volumeValues
+        volume: volumeValues,
       };
       return {
         symbol: meta.symbol,
@@ -495,7 +571,7 @@ export default function FullViewportComponent() {
         high: meta.regularMarketDayHigh,
         low: meta.regularMarketDayLow,
         previousClose,
-        ohlcvData: ohlcvData.close.length > 0 ? ohlcvData : undefined
+        ohlcvData: ohlcvData.close.length > 0 ? ohlcvData : undefined,
       };
     } catch (err) {
       return null;
@@ -504,18 +580,63 @@ export default function FullViewportComponent() {
 
   const createFallbackStockData = (): StockItem[] => {
     const stockTemplates = [
-      { symbol: 'AAPL', name: 'Apple Inc.', basePrice: 185, sector: 'Technology' },
-      { symbol: 'MSFT', name: 'Microsoft Corp.', basePrice: 415, sector: 'Technology' },
-      { symbol: 'GOOGL', name: 'Alphabet Inc.', basePrice: 153, sector: 'Technology' },
-      { symbol: 'AMZN', name: 'Amazon.com Inc.', basePrice: 178, sector: 'Consumer' },
-      { symbol: 'TSLA', name: 'Tesla Inc.', basePrice: 245, sector: 'Automotive' },
-      { symbol: 'NVDA', name: 'NVIDIA Corp.', basePrice: 950, sector: 'Technology' },
-      { symbol: 'META', name: 'Meta Platforms', basePrice: 485, sector: 'Technology' },
-      { symbol: 'JPM', name: 'JPMorgan Chase', basePrice: 189, sector: 'Financial' },
-      { symbol: 'V', name: 'Visa Inc.', basePrice: 279, sector: 'Financial' },
-      { symbol: 'JNJ', name: 'Johnson & Johnson', basePrice: 161, sector: 'Healthcare' }
+      {
+        symbol: "AAPL",
+        name: "Apple Inc.",
+        basePrice: 185,
+        sector: "Technology",
+      },
+      {
+        symbol: "MSFT",
+        name: "Microsoft Corp.",
+        basePrice: 415,
+        sector: "Technology",
+      },
+      {
+        symbol: "GOOGL",
+        name: "Alphabet Inc.",
+        basePrice: 153,
+        sector: "Technology",
+      },
+      {
+        symbol: "AMZN",
+        name: "Amazon.com Inc.",
+        basePrice: 178,
+        sector: "Consumer",
+      },
+      {
+        symbol: "TSLA",
+        name: "Tesla Inc.",
+        basePrice: 245,
+        sector: "Automotive",
+      },
+      {
+        symbol: "NVDA",
+        name: "NVIDIA Corp.",
+        basePrice: 950,
+        sector: "Technology",
+      },
+      {
+        symbol: "META",
+        name: "Meta Platforms",
+        basePrice: 485,
+        sector: "Technology",
+      },
+      {
+        symbol: "JPM",
+        name: "JPMorgan Chase",
+        basePrice: 189,
+        sector: "Financial",
+      },
+      { symbol: "V", name: "Visa Inc.", basePrice: 279, sector: "Financial" },
+      {
+        symbol: "JNJ",
+        name: "Johnson & Johnson",
+        basePrice: 161,
+        sector: "Healthcare",
+      },
     ];
-    return stockTemplates.map(stock => {
+    return stockTemplates.map((stock) => {
       const changePercent = (Math.random() - 0.5) * 5; // -2.5% 到 +2.5%
       const currentPrice = stock.basePrice * (1 + changePercent / 100);
       const changeAmount = currentPrice - stock.basePrice;
@@ -551,7 +672,7 @@ export default function FullViewportComponent() {
         volume,
         marketCap: stock.basePrice * (Math.random() * 5e6 + 1e6),
         sector: stock.sector,
-        exchange: 'NASDAQ',
+        exchange: "NASDAQ",
         lastUpdated: Date.now(),
         previousClose: stock.basePrice,
         ohlcvData: {
@@ -560,8 +681,8 @@ export default function FullViewportComponent() {
           high: highs,
           low: lows,
           close: closes,
-          volume: volumes
-        }
+          volume: volumes,
+        },
       };
     });
   };
@@ -571,8 +692,8 @@ export default function FullViewportComponent() {
       setIsLoadingCandleData(true);
       setCandleDataError(null);
       setSelectedPair(symbol);
-      setCandleViewTimeframe('15m');
-      setCurrentTimeframe('15m');
+      setCandleViewTimeframe("15m");
+      setCurrentTimeframe("15m");
       setProgress(0);
       const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=5d&interval=15m`;
       const response = await fetch(url);
@@ -580,7 +701,11 @@ export default function FullViewportComponent() {
         throw new Error(`HTTP Error ${response.status}`);
       }
       const data: YahooFinanceResponse = await response.json();
-      if (data.chart.error || !data.chart.result || data.chart.result.length === 0) {
+      if (
+        data.chart.error ||
+        !data.chart.result ||
+        data.chart.result.length === 0
+      ) {
         throw new Error(`error: ${symbol}`);
       }
       const result = data.chart.result[0];
@@ -588,11 +713,13 @@ export default function FullViewportComponent() {
       const timestamps = result.timestamp;
       const candleData: ICandleViewDataPoint[] = [];
       for (let i = 0; i < timestamps.length; i++) {
-        if (quote.open[i] !== null &&
+        if (
+          quote.open[i] !== null &&
           quote.high[i] !== null &&
           quote.low[i] !== null &&
           quote.close[i] !== null &&
-          quote.volume[i] !== null) {
+          quote.volume[i] !== null
+        ) {
           candleData.push({
             time: timestamps[i],
             open: quote.open[i] as number,
@@ -600,20 +727,20 @@ export default function FullViewportComponent() {
             low: quote.low[i] as number,
             close: quote.close[i] as number,
             volume: quote.volume[i] as number,
-            isVirtual: false
+            isVirtual: false,
           });
         }
       }
       setCandleData(candleData);
       setProgress(100);
-      if (locale === 'cn') {
+      if (locale === "cn") {
         setCandleDataError(`${symbol} 数据加载成功`);
       } else {
         setCandleDataError(`${symbol} data loaded successfully`);
       }
       setTimeout(() => setCandleDataError(null), 3000);
     } catch (err) {
-      setCandleDataError(err instanceof Error ? err.message : '获取数据失败');
+      setCandleDataError(err instanceof Error ? err.message : "获取数据失败");
     } finally {
       setTimeout(() => {
         setIsLoadingCandleData(false);
@@ -622,14 +749,18 @@ export default function FullViewportComponent() {
     }
   };
 
-  const handleStockSortChange = (newSortBy: 'volume' | 'change' | 'marketCap') => {
+  const handleStockSortChange = (
+    newSortBy: "volume" | "change" | "marketCap",
+  ) => {
     setStockSortBy(newSortBy);
     setStockDisplayCount(50);
     let sorted = [...filteredStockList];
-    if (newSortBy === 'volume') {
+    if (newSortBy === "volume") {
       sorted.sort((a, b) => b.volume - a.volume);
-    } else if (newSortBy === 'change') {
-      sorted.sort((a, b) => Math.abs(b.changePercent) - Math.abs(a.changePercent));
+    } else if (newSortBy === "change") {
+      sorted.sort(
+        (a, b) => Math.abs(b.changePercent) - Math.abs(a.changePercent),
+      );
     } else {
       sorted.sort((a, b) => (b.marketCap || 0) - (a.marketCap || 0));
     }
@@ -662,7 +793,7 @@ export default function FullViewportComponent() {
     return {
       startTime: oneHourAgo.toISOString().slice(0, 16),
       endTime: now.toISOString().slice(0, 16),
-      nowTime: now.getTime()
+      nowTime: now.getTime(),
     };
   };
 
@@ -675,7 +806,7 @@ export default function FullViewportComponent() {
     if (wsRef.current) {
       wsRef.current.close();
     }
-    const ws = new WebSocket('wss://stream.binance.com:9443/ws');
+    const ws = new WebSocket("wss://stream.binance.com:9443/ws");
     wsRef.current = ws;
     ws.onopen = () => {
       setWsConnected(true);
@@ -683,22 +814,54 @@ export default function FullViewportComponent() {
       fetchInitialData();
       setTimeout(() => {
         const popularPairs = [
-          'btcusdt', 'ethusdt', 'bnbusdt', 'solusdt', 'xrpusdt',
-          'adausdt', 'dogeusdt', 'dotusdt', 'avaxusdt', 'linkusdt',
-          'maticusdt', 'uniusdt', 'ltcusdt', 'atomusdt', 'etcusdt',
-          'trxusdt', 'filusdt', 'apeusdt', 'nearusdt', 'algoeust',
-          'ftmusdt', 'sandusdt', 'manausdt', 'axsusdt', 'thetaeust',
-          'vetusdt', 'icpusdt', 'eosusdt', 'xtzusdt', 'hbarusdt',
-          'egldusdt', 'oneusdt', 'fttusdt', 'celousdt', 'enjusdt',
-          'chzusdt', 'zilusdt', 'stxusdt', 'hntusdt', 'grtusdt'
+          "btcusdt",
+          "ethusdt",
+          "bnbusdt",
+          "solusdt",
+          "xrpusdt",
+          "adausdt",
+          "dogeusdt",
+          "dotusdt",
+          "avaxusdt",
+          "linkusdt",
+          "maticusdt",
+          "uniusdt",
+          "ltcusdt",
+          "atomusdt",
+          "etcusdt",
+          "trxusdt",
+          "filusdt",
+          "apeusdt",
+          "nearusdt",
+          "algoeust",
+          "ftmusdt",
+          "sandusdt",
+          "manausdt",
+          "axsusdt",
+          "thetaeust",
+          "vetusdt",
+          "icpusdt",
+          "eosusdt",
+          "xtzusdt",
+          "hbarusdt",
+          "egldusdt",
+          "oneusdt",
+          "fttusdt",
+          "celousdt",
+          "enjusdt",
+          "chzusdt",
+          "zilusdt",
+          "stxusdt",
+          "hntusdt",
+          "grtusdt",
         ];
         const batchSize = 10;
         for (let i = 0; i < popularPairs.length; i += batchSize) {
           const batch = popularPairs.slice(i, i + batchSize);
           const subscribeMsg = {
             method: "SUBSCRIBE",
-            params: batch.map(pair => `${pair}@ticker`),
-            id: i / batchSize + 1
+            params: batch.map((pair) => `${pair}@ticker`),
+            id: i / batchSize + 1,
           };
           setTimeout(() => {
             ws.send(JSON.stringify(subscribeMsg));
@@ -709,14 +872,13 @@ export default function FullViewportComponent() {
     ws.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
-        if (data.e === '24hrTicker') {
+        if (data.e === "24hrTicker") {
           updateCryptoPrice(data);
         }
-      } catch (err) {
-      }
+      } catch (err) {}
     };
     ws.onerror = (error) => {
-      setError('WebSocket Connect Error');
+      setError("WebSocket Connect Error");
       setWsConnected(false);
     };
     ws.onclose = () => {
@@ -734,30 +896,34 @@ export default function FullViewportComponent() {
     try {
       setIsLoading(true);
       setError(null);
-      const response = await fetch('https://api.binance.com/api/v3/ticker/24hr');
+      const response = await fetch(
+        "https://api.binance.com/api/v3/ticker/24hr",
+      );
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data: BinanceTicker24hr[] = await response.json();
       const formattedData: CryptoItem[] = data
-        .filter(item => {
-          return item.symbol.endsWith('USDT');
+        .filter((item) => {
+          return item.symbol.endsWith("USDT");
         })
-        .map(item => {
-          const pair = `${item.symbol.replace('USDT', '')}/USDT`;
+        .map((item) => {
+          const pair = `${item.symbol.replace("USDT", "")}/USDT`;
           return {
             pair,
             currentPrice: parseFloat(item.lastPrice),
             change24h: parseFloat(item.priceChangePercent),
             volume: parseFloat(item.quoteVolume),
-            priceChange: 0
+            priceChange: 0,
           };
         })
-        .filter(item => {
-          return !isNaN(item.currentPrice) &&
+        .filter((item) => {
+          return (
+            !isNaN(item.currentPrice) &&
             !isNaN(item.change24h) &&
             item.currentPrice > 0 &&
-            item.volume > 10000;
+            item.volume > 10000
+          );
         });
       setCryptoList(formattedData);
       const sorted = [...formattedData].sort((a, b) => b.volume - a.volume);
@@ -765,38 +931,115 @@ export default function FullViewportComponent() {
       setDisplayedCryptoList(sorted.slice(0, displayCount));
       setHasMore(sorted.length > displayCount);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch data');
+      setError(err instanceof Error ? err.message : "Failed to fetch data");
       const fallbackData: CryptoItem[] = [];
       const samplePairs = [
-        'BTC/USDT', 'ETH/USDT', 'BNB/USDT', 'SOL/USDT', 'XRP/USDT',
-        'ADA/USDT', 'DOGE/USDT', 'DOT/USDT', 'AVAX/USDT', 'LINK/USDT',
-        'MATIC/USDT', 'UNI/USDT', 'LTC/USDT', 'ATOM/USDT', 'ETC/USDT',
-        'TRX/USDT', 'FIL/USDT', 'APE/USDT', 'NEAR/USDT', 'ALGO/USDT',
-        'FTM/USDT', 'SAND/USDT', 'MANA/USDT', 'AXS/USDT', 'THETA/USDT',
-        'VET/USDT', 'ICP/USDT', 'EOS/USDT', 'XTZ/USDT', 'HBAR/USDT',
-        'EGLD/USDT', 'ONE/USDT', 'FTT/USDT', 'CELO/USDT', 'ENJ/USDT',
-        'CHZ/USDT', 'ZIL/USDT', 'STX/USDT', 'HNT/USDT', 'GRT/USDT',
-        'BCH/USDT', 'XLM/USDT', 'AAVE/USDT', 'CRV/USDT', 'SNX/USDT',
-        'COMP/USDT', 'MKR/USDT', 'SUSHI/USDT', 'YFI/USDT', 'RUNE/USDT',
-        'KSM/USDT', 'DASH/USDT', 'ZEC/USDT', 'XMR/USDT', 'OMG/USDT',
-        'BAT/USDT', 'QTUM/USDT', 'IOTA/USDT', 'NEO/USDT', 'ONT/USDT',
-        'VTHO/USDT', 'TFUEL/USDT', 'OCEAN/USDT', 'RSR/USDT', 'CVC/USDT',
-        'BAND/USDT', 'RLC/USDT', 'STORJ/USDT', 'SKL/USDT', 'ANKR/USDT',
-        'DENT/USDT', 'WIN/USDT', 'COS/USDT', 'CTK/USDT', 'DODO/USDT',
-        'LIT/USDT', 'BADGER/USDT', 'ALPHA/USDT', 'BEL/USDT', 'DEFI/USDT',
-        'TLM/USDT', 'LINA/USDT', 'PERP/USDT', 'DGB/USDT', 'SC/USDT',
-        'STMX/USDT', 'HOT/USDT', 'ARPA/USDT', 'DATA/USDT', 'AKRO/USDT',
-        'REEF/USDT', 'ORN/USDT', 'PSG/USDT', 'CITY/USDT', 'BAR/USDT'
+        "BTC/USDT",
+        "ETH/USDT",
+        "BNB/USDT",
+        "SOL/USDT",
+        "XRP/USDT",
+        "ADA/USDT",
+        "DOGE/USDT",
+        "DOT/USDT",
+        "AVAX/USDT",
+        "LINK/USDT",
+        "MATIC/USDT",
+        "UNI/USDT",
+        "LTC/USDT",
+        "ATOM/USDT",
+        "ETC/USDT",
+        "TRX/USDT",
+        "FIL/USDT",
+        "APE/USDT",
+        "NEAR/USDT",
+        "ALGO/USDT",
+        "FTM/USDT",
+        "SAND/USDT",
+        "MANA/USDT",
+        "AXS/USDT",
+        "THETA/USDT",
+        "VET/USDT",
+        "ICP/USDT",
+        "EOS/USDT",
+        "XTZ/USDT",
+        "HBAR/USDT",
+        "EGLD/USDT",
+        "ONE/USDT",
+        "FTT/USDT",
+        "CELO/USDT",
+        "ENJ/USDT",
+        "CHZ/USDT",
+        "ZIL/USDT",
+        "STX/USDT",
+        "HNT/USDT",
+        "GRT/USDT",
+        "BCH/USDT",
+        "XLM/USDT",
+        "AAVE/USDT",
+        "CRV/USDT",
+        "SNX/USDT",
+        "COMP/USDT",
+        "MKR/USDT",
+        "SUSHI/USDT",
+        "YFI/USDT",
+        "RUNE/USDT",
+        "KSM/USDT",
+        "DASH/USDT",
+        "ZEC/USDT",
+        "XMR/USDT",
+        "OMG/USDT",
+        "BAT/USDT",
+        "QTUM/USDT",
+        "IOTA/USDT",
+        "NEO/USDT",
+        "ONT/USDT",
+        "VTHO/USDT",
+        "TFUEL/USDT",
+        "OCEAN/USDT",
+        "RSR/USDT",
+        "CVC/USDT",
+        "BAND/USDT",
+        "RLC/USDT",
+        "STORJ/USDT",
+        "SKL/USDT",
+        "ANKR/USDT",
+        "DENT/USDT",
+        "WIN/USDT",
+        "COS/USDT",
+        "CTK/USDT",
+        "DODO/USDT",
+        "LIT/USDT",
+        "BADGER/USDT",
+        "ALPHA/USDT",
+        "BEL/USDT",
+        "DEFI/USDT",
+        "TLM/USDT",
+        "LINA/USDT",
+        "PERP/USDT",
+        "DGB/USDT",
+        "SC/USDT",
+        "STMX/USDT",
+        "HOT/USDT",
+        "ARPA/USDT",
+        "DATA/USDT",
+        "AKRO/USDT",
+        "REEF/USDT",
+        "ORN/USDT",
+        "PSG/USDT",
+        "CITY/USDT",
+        "BAR/USDT",
       ];
       samplePairs.forEach((pair, index) => {
-        const basePrice = index < 30 ? 100 * Math.random() + 10 : Math.random() * 10;
+        const basePrice =
+          index < 30 ? 100 * Math.random() + 10 : Math.random() * 10;
         const change = (Math.random() - 0.5) * 20;
         fallbackData.push({
           pair,
           currentPrice: basePrice,
           change24h: change,
           volume: Math.random() * 1000000000 + 1000000,
-          priceChange: 0
+          priceChange: 0,
         });
       });
       setCryptoList(fallbackData);
@@ -812,13 +1055,13 @@ export default function FullViewportComponent() {
   };
 
   const updateCryptoPrice = useCallback((tickerData: BinanceTickerStream) => {
-    setCryptoList(prev => {
+    setCryptoList((prev) => {
       const symbol = tickerData.s;
       const newPrice = parseFloat(tickerData.c);
       const priceChangePercent = parseFloat(tickerData.P);
       const quoteVolume = parseFloat(tickerData.q);
-      return prev.map(item => {
-        if (item.pair === `${symbol.replace('USDT', '')}/USDT`) {
+      return prev.map((item) => {
+        if (item.pair === `${symbol.replace("USDT", "")}/USDT`) {
           const oldPrice = item.currentPrice;
           const priceChange = oldPrice ? newPrice - oldPrice : 0;
           return {
@@ -826,7 +1069,7 @@ export default function FullViewportComponent() {
             currentPrice: newPrice,
             change24h: priceChangePercent,
             volume: quoteVolume,
-            priceChange
+            priceChange,
           };
         }
         return item;
@@ -834,7 +1077,10 @@ export default function FullViewportComponent() {
     });
   }, []);
 
-  const fetchCandleDataByTimeframe = async (pair: string, timeframe: string) => {
+  const fetchCandleDataByTimeframe = async (
+    pair: string,
+    timeframe: string,
+  ) => {
     try {
       setIsLoadingCandleData(true);
       setCandleDataError(null);
@@ -842,33 +1088,47 @@ export default function FullViewportComponent() {
       setCandleViewTimeframe(timeframe);
       setCurrentTimeframe(timeframe);
       setProgress(0);
-      const binanceSymbol = pair.replace('/', '').toUpperCase();
-      const binanceInterval = BINANCE_INTERVAL_MAP[timeframe] || '1m';
-      const { limit, totalCandles } = TIMEFRAME_CONFIGS[timeframe] || TIMEFRAME_CONFIGS['1m'];
+      const binanceSymbol = pair.replace("/", "").toUpperCase();
+      const binanceInterval = BINANCE_INTERVAL_MAP[timeframe] || "1m";
+      const { limit, totalCandles } =
+        TIMEFRAME_CONFIGS[timeframe] || TIMEFRAME_CONFIGS["1m"];
       let allData: ICandleViewDataPoint[] = [];
       let endTime = Date.now();
       let startTime: number;
       const timeIntervalMs = getTimeIntervalInMs(timeframe);
-      if (timeframe.includes('D') || timeframe.includes('W') || timeframe.includes('M')) {
+      if (
+        timeframe.includes("D") ||
+        timeframe.includes("W") ||
+        timeframe.includes("M")
+      ) {
         const daysToFetch = getDaysToFetch(timeframe);
-        startTime = endTime - (daysToFetch * 24 * 60 * 60 * 1000);
+        startTime = endTime - daysToFetch * 24 * 60 * 60 * 1000;
       } else {
-        startTime = endTime - (totalCandles * timeIntervalMs);
+        startTime = endTime - totalCandles * timeIntervalMs;
       }
       const batchSize = Math.min(limit, 1000);
       let currentEndTime = endTime;
       let fetchedCount = 0;
       const maxBatches = 10;
-      for (let batch = 0; batch < maxBatches && fetchedCount < totalCandles && currentEndTime > startTime; batch++) {
+      for (
+        let batch = 0;
+        batch < maxBatches &&
+        fetchedCount < totalCandles &&
+        currentEndTime > startTime;
+        batch++
+      ) {
         try {
-          const batchStartTime = Math.max(startTime, currentEndTime - (batchSize * timeIntervalMs));
+          const batchStartTime = Math.max(
+            startTime,
+            currentEndTime - batchSize * timeIntervalMs,
+          );
           const response = await fetch(
             `https://api.binance.com/api/v3/klines?` +
-            `symbol=${binanceSymbol}&` +
-            `interval=${binanceInterval}&` +
-            `limit=${batchSize}&` +
-            `startTime=${batchStartTime}&` +
-            `endTime=${currentEndTime}`
+              `symbol=${binanceSymbol}&` +
+              `interval=${binanceInterval}&` +
+              `limit=${batchSize}&` +
+              `startTime=${batchStartTime}&` +
+              `endTime=${currentEndTime}`,
           );
           if (!response.ok) {
             throw new Error(`HTTP Error ${response.status}`);
@@ -877,31 +1137,36 @@ export default function FullViewportComponent() {
           if (klineData.length === 0) {
             break;
           }
-          const formattedData: ICandleViewDataPoint[] = klineData.map(kline => ({
-            time: Math.floor(kline[0] / 1000),
-            open: parseFloat(kline[1]),
-            high: parseFloat(kline[2]),
-            low: parseFloat(kline[3]),
-            close: parseFloat(kline[4]),
-            volume: parseFloat(kline[5]),
-            isVirtual: false
-          }));
+          const formattedData: ICandleViewDataPoint[] = klineData.map(
+            (kline) => ({
+              time: Math.floor(kline[0] / 1000),
+              open: parseFloat(kline[1]),
+              high: parseFloat(kline[2]),
+              low: parseFloat(kline[3]),
+              close: parseFloat(kline[4]),
+              volume: parseFloat(kline[5]),
+              isVirtual: false,
+            }),
+          );
           allData = [...formattedData, ...allData];
           fetchedCount += klineData.length;
           currentEndTime = klineData[0][0] - 1;
-          const progressPercent = Math.min(100, Math.round((fetchedCount / totalCandles) * 100));
+          const progressPercent = Math.min(
+            100,
+            Math.round((fetchedCount / totalCandles) * 100),
+          );
           setProgress(progressPercent);
-          await new Promise(resolve => setTimeout(resolve, 50));
-
+          await new Promise((resolve) => setTimeout(resolve, 50));
         } catch (batchError) {
           break;
         }
       }
       allData.sort((a, b) => a.time - b.time);
       if (allData.length === 0) {
-        throw new Error(locale === 'cn'
-          ? `未获取到 ${pair} 的 ${timeframe} 数据`
-          : `No ${timeframe} data obtained for ${pair}`
+        throw new Error(
+          locale === "cn"
+            ? `未获取到 ${pair} 的 ${timeframe} 数据`
+            : `No ${timeframe} data obtained for ${pair}`,
         );
       }
       if (allData.length > totalCandles) {
@@ -909,11 +1174,16 @@ export default function FullViewportComponent() {
       }
       setCandleData(allData);
       setProgress(100);
-
     } catch (err) {
-      setCandleDataError(err instanceof Error ? err.message : locale === 'cn' ? '获取数据失败' : 'Failed to fetch data');
-      if (timeframe !== '15m') {
-        return fetchCandleDataByTimeframe(pair, '15m');
+      setCandleDataError(
+        err instanceof Error
+          ? err.message
+          : locale === "cn"
+            ? "获取数据失败"
+            : "Failed to fetch data",
+      );
+      if (timeframe !== "15m") {
+        return fetchCandleDataByTimeframe(pair, "15m");
       }
     } finally {
       setTimeout(() => {
@@ -924,18 +1194,18 @@ export default function FullViewportComponent() {
   };
 
   const getCandleViewTitle = () => {
-    return selectedPair || 'Test';
+    return selectedPair || "Test";
   };
 
   const getDaysToFetch = (timeframe: string): number => {
     const unit = timeframe.slice(-1);
     const value = parseInt(timeframe.slice(0, -1)) || 1;
     switch (unit) {
-      case 'D':
+      case "D":
         return value * 1000;
-      case 'W':
+      case "W":
         return value * 1000 * 7;
-      case 'M':
+      case "M":
         return value * 1000 * 30;
       default:
         return 30;
@@ -946,19 +1216,26 @@ export default function FullViewportComponent() {
     const unit = timeframe.slice(-1);
     const value = parseInt(timeframe.slice(0, -1)) || 1;
     switch (unit) {
-      case 's': return value * 1000;
-      case 'm': return value * 60 * 1000;
-      case 'H': return value * 60 * 60 * 1000;
-      case 'D': return value * 24 * 60 * 60 * 1000;
-      case 'W': return value * 7 * 24 * 60 * 60 * 1000;
-      case 'M': return value * 30 * 24 * 60 * 60 * 1000;
-      default: return 60 * 1000;
+      case "s":
+        return value * 1000;
+      case "m":
+        return value * 60 * 1000;
+      case "H":
+        return value * 60 * 60 * 1000;
+      case "D":
+        return value * 24 * 60 * 60 * 1000;
+      case "W":
+        return value * 7 * 24 * 60 * 60 * 1000;
+      case "M":
+        return value * 30 * 24 * 60 * 60 * 1000;
+      default:
+        return 60 * 1000;
     }
   };
 
   const handleCryptoClick = async (pair: string) => {
-    setCandleViewTimeframe('15m');
-    await fetchCandleDataByTimeframe(pair, '15m');
+    setCandleViewTimeframe("15m");
+    await fetchCandleDataByTimeframe(pair, "15m");
   };
 
   useEffect(() => {
@@ -983,10 +1260,12 @@ export default function FullViewportComponent() {
   useEffect(() => {
     if (!stockSearchTerm.trim()) {
       let sorted = [...stockList];
-      if (stockSortBy === 'volume') {
+      if (stockSortBy === "volume") {
         sorted.sort((a, b) => b.volume - a.volume);
-      } else if (stockSortBy === 'change') {
-        sorted.sort((a, b) => Math.abs(b.changePercent) - Math.abs(a.changePercent));
+      } else if (stockSortBy === "change") {
+        sorted.sort(
+          (a, b) => Math.abs(b.changePercent) - Math.abs(a.changePercent),
+        );
       } else {
         sorted.sort((a, b) => (b.marketCap || 0) - (a.marketCap || 0));
       }
@@ -994,16 +1273,20 @@ export default function FullViewportComponent() {
       setDisplayedStockList(sorted.slice(0, stockDisplayCount));
       setStockHasMore(sorted.length > stockDisplayCount);
     } else {
-      const filtered = stockList.filter(item =>
-        item.symbol.toLowerCase().includes(stockSearchTerm.toLowerCase()) ||
-        item.name.toLowerCase().includes(stockSearchTerm.toLowerCase()) ||
-        (item.sector && item.sector.toLowerCase().includes(stockSearchTerm.toLowerCase()))
+      const filtered = stockList.filter(
+        (item) =>
+          item.symbol.toLowerCase().includes(stockSearchTerm.toLowerCase()) ||
+          item.name.toLowerCase().includes(stockSearchTerm.toLowerCase()) ||
+          (item.sector &&
+            item.sector.toLowerCase().includes(stockSearchTerm.toLowerCase())),
       );
       let sorted = filtered;
-      if (stockSortBy === 'volume') {
+      if (stockSortBy === "volume") {
         sorted.sort((a, b) => b.volume - a.volume);
-      } else if (stockSortBy === 'change') {
-        sorted.sort((a, b) => Math.abs(b.changePercent) - Math.abs(a.changePercent));
+      } else if (stockSortBy === "change") {
+        sorted.sort(
+          (a, b) => Math.abs(b.changePercent) - Math.abs(a.changePercent),
+        );
       } else {
         sorted.sort((a, b) => (b.marketCap || 0) - (a.marketCap || 0));
       }
@@ -1027,21 +1310,22 @@ export default function FullViewportComponent() {
 
   useEffect(() => {
     if (!searchTerm.trim()) {
-      let sorted = [...cryptoList];
-      if (sortBy === 'volume') {
+      const sorted = [...cryptoList];
+      if (sortBy === "volume") {
         sorted.sort((a, b) => b.volume - a.volume);
       } else {
         sorted.sort((a, b) => Math.abs(b.change24h) - Math.abs(a.change24h));
       }
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFilteredCryptoList(sorted);
       setDisplayedCryptoList(sorted.slice(0, displayCount));
       setHasMore(sorted.length > displayCount);
     } else {
-      const filtered = cryptoList.filter(item =>
-        item.pair.toLowerCase().includes(searchTerm.toLowerCase())
+      const filtered = cryptoList.filter((item) =>
+        item.pair.toLowerCase().includes(searchTerm.toLowerCase()),
       );
-      let sorted = filtered;
-      if (sortBy === 'volume') {
+      const sorted = filtered;
+      if (sortBy === "volume") {
         sorted.sort((a, b) => b.volume - a.volume);
       } else {
         sorted.sort((a, b) => Math.abs(b.change24h) - Math.abs(a.change24h));
@@ -1070,27 +1354,27 @@ export default function FullViewportComponent() {
     fetchInitialData();
   };
 
-  const handleSortChange = (newSortBy: 'volume' | 'change') => {
+  const handleSortChange = (newSortBy: "volume" | "change") => {
     setSortBy(newSortBy);
     setDisplayCount(50);
   };
 
   useEffect(() => {
     const checkTheme = () => {
-      const isDarkTheme = document.documentElement.classList.contains('dark');
+      const isDarkTheme = document.documentElement.classList.contains("dark");
       setIsDark(isDarkTheme);
     };
     checkTheme();
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
-        if (mutation.attributeName === 'class') {
+        if (mutation.attributeName === "class") {
           checkTheme();
         }
       });
     });
     observer.observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ['class'],
+      attributeFilter: ["class"],
     });
     return () => {
       observer.disconnect();
@@ -1098,31 +1382,103 @@ export default function FullViewportComponent() {
   }, []);
 
   const getCandleViewI18n = () => {
-    if (locale === 'cn') {
-      return 'zh-cn';
+    if (locale === "cn") {
+      return "zh-cn";
     }
-    return 'en';
+    return "en";
   };
 
-  const startResizing = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    if (!containerRef.current) return;
-    startXRef.current = e.clientX;
-    startWidthRef.current = leftPanelWidth;
-    setIsResizing(true);
-  }, [leftPanelWidth]);
+  const startResizing = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      if (!containerRef.current) return;
+      startXRef.current = e.clientX;
+      startWidthRef.current = leftPanelWidth;
+      setIsResizing(true);
+    },
+    [leftPanelWidth],
+  );
 
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (!isResizing || !containerRef.current) return;
-    const containerRect = containerRef.current.getBoundingClientRect();
-    const containerWidth = containerRect.width;
-    const deltaX = e.clientX - startXRef.current;
-    const deltaPercent = (deltaX / containerWidth) * 100;
-    let newWidth = startWidthRef.current + deltaPercent;
-    newWidth = Math.max(50, newWidth);
-    newWidth = Math.min(90, newWidth);
-    setLeftPanelWidth(newWidth);
-  }, [isResizing]);
+  const handleMouseMove = useCallback(
+    (e: MouseEvent) => {
+      if (!isResizing || !containerRef.current) return;
+      const containerRect = containerRef.current.getBoundingClientRect();
+      const containerWidth = containerRect.width;
+      const deltaX = e.clientX - startXRef.current;
+      const deltaPercent = (deltaX / containerWidth) * 100;
+      let newWidth = startWidthRef.current + deltaPercent;
+      newWidth = Math.max(50, newWidth);
+      newWidth = Math.min(90, newWidth);
+      setLeftPanelWidth(newWidth);
+    },
+    [isResizing],
+  );
+
+  const updateChartData = useCallback(
+    (data: ICandleViewDataPoint[]) => {
+      if (candleViewRef.current && isInitialized && data.length > 0) {
+        candleViewRef.current.setData(data);
+      }
+    },
+    [isInitialized],
+  );
+
+  useEffect(() => {
+    if (candleData.length > 0 && isInitialized) {
+      updateChartData(candleData);
+    }
+  }, [candleData, isInitialized, updateChartData]);
+
+  useEffect(() => {
+    const checkTheme = () => {
+      const isDarkTheme = document.documentElement.classList.contains("dark");
+      setIsDark(isDarkTheme);
+      if (candleViewRef.current) {
+        candleViewRef.current.setTheme(isDarkTheme ? "dark" : "light");
+      }
+    };
+    checkTheme();
+    const observer = new MutationObserver(() => checkTheme());
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (candleViewRef.current && isInitialized) {
+      candleViewRef.current.setLocale(locale === "cn" ? "zh-cn" : "en");
+    }
+  }, [locale, isInitialized]);
+
+  useEffect(() => {
+    if (!containerRef.current || candleViewRef.current) return;
+
+    const isDarkTheme = document.documentElement.classList.contains("dark");
+    const currentTheme = isDarkTheme ? "dark" : "light";
+
+    const candleView = new CandleView({
+      parent: containerRef.current,
+      title: "Market Data",
+      data: TEST_CANDLEVIEW_DATA8,
+      theme: currentTheme,
+      locale: locale === "cn" ? "zh-cn" : "en",
+      technologyPanel: true,
+      drawingPanel: true,
+    });
+
+    candleViewRef.current = candleView;
+    setIsInitialized(true);
+
+    return () => {
+      if (candleViewRef.current) {
+        candleViewRef.current.destroy();
+        candleViewRef.current = null;
+      }
+      setIsInitialized(false);
+    };
+  }, []);
 
   const stopResizing = useCallback(() => {
     setIsResizing(false);
@@ -1130,27 +1486,27 @@ export default function FullViewportComponent() {
 
   useEffect(() => {
     if (isResizing) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', stopResizing);
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseup", stopResizing);
     } else {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', stopResizing);
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", stopResizing);
     }
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', stopResizing);
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", stopResizing);
     };
   }, [isResizing, handleMouseMove, stopResizing]);
 
   const toggleMenu = (index: number) => {
-    setExpandedMenus(prev =>
-      prev.includes(index)
-        ? prev.filter(i => i !== index)
-        : [...prev, index]
+    setExpandedMenus((prev) =>
+      prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index],
     );
   };
 
-  const [generatedCandleData, setGeneratedCandleData] = useState<ICandleViewDataPoint[]>([]);
+  const [generatedCandleData, setGeneratedCandleData] = useState<
+    ICandleViewDataPoint[]
+  >([]);
   const [realtimeData, setRealtimeData] = useState<ICandleViewDataPoint[]>([]);
   const [generatorParams, setGeneratorParams] = useState<GeneratorParams>({
     volatility: 5,
@@ -1158,7 +1514,7 @@ export default function FullViewportComponent() {
     endTime: initialTimes.endTime,
     minPrice: 100,
     maxPrice: 200,
-    trendDirection: 'random',
+    trendDirection: "random",
     gapProbability: 5,
     volumeCorrelation: 7,
     anomalyProbability: 2,
@@ -1172,66 +1528,86 @@ export default function FullViewportComponent() {
   const [markData, setMarkData] = useState<MarkDataItem[]>([]);
 
   const cryptoControls = (
-    <div className={`sticky top-0 z-10 p-3 border-b ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-gray-300'}`}>
+    <div
+      className={`sticky top-0 z-10 p-3 border-b ${isDark ? "bg-gray-800 border-gray-700" : "bg-gray-50 border-gray-300"}`}
+    >
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center space-x-2">
           <button
-            onClick={() => handleSortChange('volume')}
-            className={`px-2 py-1 text-xs rounded ${sortBy === 'volume'
-              ? isDark ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white'
-              : isDark ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-              }`}
+            onClick={() => handleSortChange("volume")}
+            className={`px-2 py-1 text-xs rounded ${
+              sortBy === "volume"
+                ? isDark
+                  ? "bg-blue-600 text-white"
+                  : "bg-blue-500 text-white"
+                : isDark
+                  ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+            }`}
           >
-            {locale === 'cn' ? '按交易量' : 'By Volume'}
+            {locale === "cn" ? "按交易量" : "By Volume"}
           </button>
           <button
-            onClick={() => handleSortChange('change')}
-            className={`px-2 py-1 text-xs rounded ${sortBy === 'change'
-              ? isDark ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white'
-              : isDark ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-              }`}
+            onClick={() => handleSortChange("change")}
+            className={`px-2 py-1 text-xs rounded ${
+              sortBy === "change"
+                ? isDark
+                  ? "bg-blue-600 text-white"
+                  : "bg-blue-500 text-white"
+                : isDark
+                  ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+            }`}
           >
-            {locale === 'cn' ? '按波动' : 'By Change'}
+            {locale === "cn" ? "按波动" : "By Change"}
           </button>
         </div>
         <div className="flex items-center space-x-2">
-          <div className={`text-xs ${wsConnected ? (isDark ? 'text-green-400' : 'text-green-600') : (isDark ? 'text-red-400' : 'text-red-600')}`}>
-            {wsConnected ? '●' : '○'}
+          <div
+            className={`text-xs ${wsConnected ? (isDark ? "text-green-400" : "text-green-600") : isDark ? "text-red-400" : "text-red-600"}`}
+          >
+            {wsConnected ? "●" : "○"}
           </div>
           <button
             onClick={handleRefresh}
             disabled={isRefreshing}
-            className={`px-2 py-1 text-xs rounded ${isDark
-              ? 'bg-gray-700 text-gray-300 hover:bg-gray-600 disabled:opacity-50'
-              : 'bg-gray-200 text-gray-700 hover:bg-gray-300 disabled:opacity-50'
-              }`}
+            className={`px-2 py-1 text-xs rounded ${
+              isDark
+                ? "bg-gray-700 text-gray-300 hover:bg-gray-600 disabled:opacity-50"
+                : "bg-gray-200 text-gray-700 hover:bg-gray-300 disabled:opacity-50"
+            }`}
           >
-            {isRefreshing ? '🔄' : '↻'}
+            {isRefreshing ? "🔄" : "↻"}
           </button>
         </div>
       </div>
       <input
         type="text"
-        placeholder={locale === 'cn' ? '搜索交易对...' : 'Search trading pairs...'}
+        placeholder={
+          locale === "cn" ? "搜索交易对..." : "Search trading pairs..."
+        }
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        className={`w-full px-3 py-2 text-sm rounded ${isDark
-          ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
-          : 'bg-white border-gray-300 text-gray-800 placeholder-gray-500'
-          } border focus:outline-none focus:ring-2 ${isDark ? 'focus:ring-blue-500' : 'focus:ring-blue-400'}`}
+        className={`w-full px-3 py-2 text-sm rounded ${
+          isDark
+            ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+            : "bg-white border-gray-300 text-gray-800 placeholder-gray-500"
+        } border focus:outline-none focus:ring-2 ${isDark ? "focus:ring-blue-500" : "focus:ring-blue-400"}`}
       />
       {isLoading && !isRefreshing && (
         <div className="mt-2 text-xs text-center text-gray-500">
-          {locale === 'cn' ? '加载中...' : 'Loading...'}
+          {locale === "cn" ? "加载中..." : "Loading..."}
         </div>
       )}
       {isRefreshing && (
         <div className="mt-2 text-xs text-center text-gray-500">
-          {locale === 'cn' ? '刷新中...' : 'Refreshing...'}
+          {locale === "cn" ? "刷新中..." : "Refreshing..."}
         </div>
       )}
       {error && (
-        <div className={`mt-2 text-xs text-center ${isDark ? 'text-red-400' : 'text-red-600'}`}>
+        <div
+          className={`mt-2 text-xs text-center ${isDark ? "text-red-400" : "text-red-600"}`}
+        >
           {error}
         </div>
       )}
@@ -1239,32 +1615,63 @@ export default function FullViewportComponent() {
   );
 
   const loadMoreButton = hasMore && (
-    <div className={`sticky bottom-0 p-3 border-t ${isDark
-      ? 'bg-gray-800 border-gray-700'
-      : 'bg-gray-50 border-gray-300'
-      }`}>
+    <div
+      className={`sticky bottom-0 p-3 border-t ${
+        isDark ? "bg-gray-800 border-gray-700" : "bg-gray-50 border-gray-300"
+      }`}
+    >
       <button
         onClick={loadMore}
         disabled={isLoadingMore}
-        className={`w-full py-2 text-sm font-medium rounded-lg transition-colors duration-200 ${isDark
-          ? 'bg-blue-600 hover:bg-blue-700 text-white disabled:bg-blue-800'
-          : 'bg-blue-500 hover:bg-blue-600 text-white disabled:bg-blue-400'
-          }`}
+        className={`w-full py-2 text-sm font-medium rounded-lg transition-colors duration-200 ${
+          isDark
+            ? "bg-blue-600 hover:bg-blue-700 text-white disabled:bg-blue-800"
+            : "bg-blue-500 hover:bg-blue-600 text-white disabled:bg-blue-400"
+        }`}
       >
         {isLoadingMore ? (
           <span className="flex items-center justify-center">
-            <svg className="animate-spin h-4 w-4 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            <svg
+              className="animate-spin h-4 w-4 mr-2 text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              ></circle>
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
             </svg>
-            {locale === 'cn' ? '加载中...' : 'Loading...'}
+            {locale === "cn" ? "加载中..." : "Loading..."}
           </span>
         ) : (
           <span className="flex items-center justify-center">
-            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+            <svg
+              className="w-4 h-4 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M19 14l-7 7m0 0l-7-7m7 7V3"
+              ></path>
             </svg>
-            {locale === 'cn' ? `显示更多 (${displayedCryptoList.length}/${filteredCryptoList.length})` : `Load More (${displayedCryptoList.length}/${filteredCryptoList.length})`}
+            {locale === "cn"
+              ? `显示更多 (${displayedCryptoList.length}/${filteredCryptoList.length})`
+              : `Load More (${displayedCryptoList.length}/${filteredCryptoList.length})`}
           </span>
         )}
       </button>
@@ -1272,43 +1679,58 @@ export default function FullViewportComponent() {
   );
 
   const stockControls = (
-    <div className={`sticky top-0 z-10 p-3 border-b ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-gray-300'}`}>
+    <div
+      className={`sticky top-0 z-10 p-3 border-b ${isDark ? "bg-gray-800 border-gray-700" : "bg-gray-50 border-gray-300"}`}
+    >
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center space-x-1">
           <button
-            onClick={() => handleStockSortChange('volume')}
+            onClick={() => handleStockSortChange("volume")}
             disabled={isLoadingStocks}
-            className={`px-2 py-1 text-xs rounded ${stockSortBy === 'volume'
-              ? isDark ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white'
-              : isDark ? 'bg-gray-700 text-gray-300 hover:bg-gray-600 disabled:opacity-50' : 'bg-gray-200 text-gray-700 hover:bg-gray-300 disabled:opacity-50'
-              }`}
+            className={`px-2 py-1 text-xs rounded ${
+              stockSortBy === "volume"
+                ? isDark
+                  ? "bg-blue-600 text-white"
+                  : "bg-blue-500 text-white"
+                : isDark
+                  ? "bg-gray-700 text-gray-300 hover:bg-gray-600 disabled:opacity-50"
+                  : "bg-gray-200 text-gray-700 hover:bg-gray-300 disabled:opacity-50"
+            }`}
           >
-            {locale === 'cn' ? '成交量' : 'Volume'}
+            {locale === "cn" ? "成交量" : "Volume"}
           </button>
           <button
-            onClick={() => handleStockSortChange('change')}
+            onClick={() => handleStockSortChange("change")}
             disabled={isLoadingStocks}
-            className={`px-2 py-1 text-xs rounded ${stockSortBy === 'change'
-              ? isDark ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white'
-              : isDark ? 'bg-gray-700 text-gray-300 hover:bg-gray-600 disabled:opacity-50' : 'bg-gray-200 text-gray-700 hover:bg-gray-300 disabled:opacity-50'
-              }`}
+            className={`px-2 py-1 text-xs rounded ${
+              stockSortBy === "change"
+                ? isDark
+                  ? "bg-blue-600 text-white"
+                  : "bg-blue-500 text-white"
+                : isDark
+                  ? "bg-gray-700 text-gray-300 hover:bg-gray-600 disabled:opacity-50"
+                  : "bg-gray-200 text-gray-700 hover:bg-gray-300 disabled:opacity-50"
+            }`}
           >
-            {locale === 'cn' ? '涨跌幅' : 'Change'}
+            {locale === "cn" ? "涨跌幅" : "Change"}
           </button>
         </div>
         <div className="flex items-center space-x-2">
-          <div className={`text-xs ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>
+          <div
+            className={`text-xs ${isDark ? "text-blue-400" : "text-blue-600"}`}
+          >
             Yahoo Finance
           </div>
           <button
             onClick={handleRefreshStocks}
             disabled={isLoadingStocks || isRefreshingStocks}
-            className={`px-2 py-1 text-xs rounded ${isDark
-              ? 'bg-gray-700 text-gray-300 hover:bg-gray-600 disabled:opacity-50'
-              : 'bg-gray-200 text-gray-700 hover:bg-gray-300 disabled:opacity-50'
-              }`}
+            className={`px-2 py-1 text-xs rounded ${
+              isDark
+                ? "bg-gray-700 text-gray-300 hover:bg-gray-600 disabled:opacity-50"
+                : "bg-gray-200 text-gray-700 hover:bg-gray-300 disabled:opacity-50"
+            }`}
           >
-            {isRefreshingStocks ? '🔄' : '↻'}
+            {isRefreshingStocks ? "🔄" : "↻"}
           </button>
         </div>
       </div>
@@ -1316,37 +1738,57 @@ export default function FullViewportComponent() {
       <div className="mb-2">
         <input
           type="text"
-          placeholder={locale === 'cn' ? '搜索股票代码或名称...' : 'Search stock symbol or name...'}
+          placeholder={
+            locale === "cn"
+              ? "搜索股票代码或名称..."
+              : "Search stock symbol or name..."
+          }
           value={stockSearchTerm}
           onChange={(e) => setStockSearchTerm(e.target.value)}
           disabled={isLoadingStocks}
-          className={`w-full px-3 py-2 text-sm rounded ${isDark
-            ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 disabled:opacity-50'
-            : 'bg-white border-gray-300 text-gray-800 placeholder-gray-500 disabled:opacity-50'
-            } border focus:outline-none focus:ring-2 ${isDark ? 'focus:ring-blue-500' : 'focus:ring-blue-400'}`}
+          className={`w-full px-3 py-2 text-sm rounded ${
+            isDark
+              ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400 disabled:opacity-50"
+              : "bg-white border-gray-300 text-gray-800 placeholder-gray-500 disabled:opacity-50"
+          } border focus:outline-none focus:ring-2 ${isDark ? "focus:ring-blue-500" : "focus:ring-blue-400"}`}
         />
       </div>
       <div className="flex items-center justify-between text-xs">
-        <div className={`${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+        <div className={`${isDark ? "text-gray-400" : "text-gray-600"}`}>
           {isLoadingStocks ? (
             <span className="flex items-center">
-              <svg className="animate-spin h-3 w-3 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              <svg
+                className="animate-spin h-3 w-3 mr-1"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
               </svg>
-              {locale === 'cn' ? '加载中...' : 'Loading...'}
+              {locale === "cn" ? "加载中..." : "Loading..."}
             </span>
           ) : displayedStockList.length > 0 ? (
             <span>
-              {locale === 'cn'
+              {locale === "cn"
                 ? `显示 ${displayedStockList.length} 只股票`
-                : `Showing ${displayedStockList.length} stocks`
-              }
+                : `Showing ${displayedStockList.length} stocks`}
             </span>
           ) : null}
         </div>
         {stockError && (
-          <div className={`${isDark ? 'text-yellow-400' : 'text-yellow-600'}`}>
+          <div className={`${isDark ? "text-yellow-400" : "text-yellow-600"}`}>
             ⚠️ {stockError}
           </div>
         )}
@@ -1355,32 +1797,63 @@ export default function FullViewportComponent() {
   );
 
   const stockLoadMoreButton = stockHasMore && (
-    <div className={`sticky bottom-0 p-3 border-t ${isDark
-      ? 'bg-gray-800 border-gray-700'
-      : 'bg-gray-50 border-gray-300'
-      }`}>
+    <div
+      className={`sticky bottom-0 p-3 border-t ${
+        isDark ? "bg-gray-800 border-gray-700" : "bg-gray-50 border-gray-300"
+      }`}
+    >
       <button
         onClick={loadMoreStocks}
         disabled={isLoadingStocks || isRefreshingStocks}
-        className={`w-full py-2 text-sm font-medium rounded-lg transition-colors duration-200 ${isDark
-          ? 'bg-green-600 hover:bg-green-700 text-white disabled:bg-green-800'
-          : 'bg-green-500 hover:bg-green-600 text-white disabled:bg-green-400'
-          }`}
+        className={`w-full py-2 text-sm font-medium rounded-lg transition-colors duration-200 ${
+          isDark
+            ? "bg-green-600 hover:bg-green-700 text-white disabled:bg-green-800"
+            : "bg-green-500 hover:bg-green-600 text-white disabled:bg-green-400"
+        }`}
       >
         {isLoadingStocks ? (
           <span className="flex items-center justify-center">
-            <svg className="animate-spin h-4 w-4 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            <svg
+              className="animate-spin h-4 w-4 mr-2 text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              ></circle>
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
             </svg>
-            {locale === 'cn' ? '加载中...' : 'Loading...'}
+            {locale === "cn" ? "加载中..." : "Loading..."}
           </span>
         ) : (
           <span className="flex items-center justify-center">
-            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+            <svg
+              className="w-4 h-4 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M19 14l-7 7m0 0l-7-7m7 7V3"
+              ></path>
             </svg>
-            {locale === 'cn' ? `加载更多股票 (${displayedStockList.length}/${filteredStockList.length})` : `Load More Stocks (${displayedStockList.length}/${filteredStockList.length})`}
+            {locale === "cn"
+              ? `加载更多股票 (${displayedStockList.length}/${filteredStockList.length})`
+              : `Load More Stocks (${displayedStockList.length}/${filteredStockList.length})`}
           </span>
         )}
       </button>
@@ -1390,7 +1863,7 @@ export default function FullViewportComponent() {
   const menuItems = [
     {
       id: 1,
-      title: locale === 'cn' ? '加密货币' : 'Cryptos',
+      title: locale === "cn" ? "加密货币" : "Cryptos",
       content: (
         <>
           {cryptoControls}
@@ -1402,39 +1875,63 @@ export default function FullViewportComponent() {
           />
           {loadMoreButton}
           {filteredCryptoList.length > 0 && !hasMore && (
-            <div className={`sticky bottom-0 p-2 text-xs text-center border-t ${isDark
-              ? 'bg-gray-800 border-gray-700 text-gray-400'
-              : 'bg-gray-50 border-gray-300 text-gray-600'
-              }`}>
-              {locale === 'cn'
-                ? `已显示全部 ${filteredCryptoList.length} 个交易对 (WebSocket: ${wsConnected ? '已连接' : '未连接'})`
-                : `Showing all ${filteredCryptoList.length} pairs (WS: ${wsConnected ? 'connected' : 'disconnected'})`
-              }
+            <div
+              className={`sticky bottom-0 p-2 text-xs text-center border-t ${
+                isDark
+                  ? "bg-gray-800 border-gray-700 text-gray-400"
+                  : "bg-gray-50 border-gray-300 text-gray-600"
+              }`}
+            >
+              {locale === "cn"
+                ? `已显示全部 ${filteredCryptoList.length} 个交易对 (WebSocket: ${wsConnected ? "已连接" : "未连接"})`
+                : `Showing all ${filteredCryptoList.length} pairs (WS: ${wsConnected ? "connected" : "disconnected"})`}
             </div>
           )}
         </>
-      )
+      ),
     },
     {
       id: 2,
-      title: locale === 'cn' ? '美国股票' : 'US Stocks',
+      title: locale === "cn" ? "美国股票" : "US Stocks",
       content: (
         <>
           {stockControls}
           {isLoadingStocks && displayedStockList.length === 0 ? (
             <div className="flex items-center justify-center h-40">
-              <div className={`text-center ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                <svg className="animate-spin h-8 w-8 mx-auto mb-2 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              <div
+                className={`text-center ${isDark ? "text-gray-400" : "text-gray-600"}`}
+              >
+                <svg
+                  className="animate-spin h-8 w-8 mx-auto mb-2 text-blue-500"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
                 </svg>
-                {locale === 'cn' ? '正在加载股票数据...' : 'Loading stock data...'}
+                {locale === "cn"
+                  ? "正在加载股票数据..."
+                  : "Loading stock data..."}
               </div>
             </div>
           ) : displayedStockList.length === 0 ? (
             <div className="flex items-center justify-center h-40">
-              <div className={`text-center ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                {locale === 'cn' ? '暂无股票数据' : 'No stock data available'}
+              <div
+                className={`text-center ${isDark ? "text-gray-400" : "text-gray-600"}`}
+              >
+                {locale === "cn" ? "暂无股票数据" : "No stock data available"}
               </div>
             </div>
           ) : (
@@ -1449,269 +1946,103 @@ export default function FullViewportComponent() {
             </>
           )}
           {filteredStockList.length > 0 && !stockHasMore && (
-            <div className={`sticky bottom-0 p-2 text-xs text-center border-t ${isDark
-              ? 'bg-gray-800 border-gray-700 text-gray-400'
-              : 'bg-gray-50 border-gray-300 text-gray-600'
-              }`}>
-              {locale === 'cn'
+            <div
+              className={`sticky bottom-0 p-2 text-xs text-center border-t ${
+                isDark
+                  ? "bg-gray-800 border-gray-700 text-gray-400"
+                  : "bg-gray-50 border-gray-300 text-gray-600"
+              }`}
+            >
+              {locale === "cn"
                 ? `已显示全部 ${filteredStockList.length} 只股票 (API: ${STOCK_APIS[currentStockApiIndex].name})`
-                : `Showing all ${filteredStockList.length} stocks (API: ${STOCK_APIS[currentStockApiIndex].name})`
-              }
+                : `Showing all ${filteredStockList.length} stocks (API: ${STOCK_APIS[currentStockApiIndex].name})`}
             </div>
           )}
         </>
-      )
+      ),
     },
   ];
 
   const getDividerHandleColor = () => {
     return isDark
-      ? 'bg-gray-600 group-hover:bg-blue-600'
-      : 'bg-gray-400 group-hover:bg-blue-500';
+      ? "bg-gray-600 group-hover:bg-blue-600"
+      : "bg-gray-400 group-hover:bg-blue-500";
   };
+
   return (
-    <div
-      ref={containerRef}
-      className="fixed inset-0 overflow-hidden"
-    >
+    <div className="fixed inset-0 overflow-hidden">
       <div className="w-full h-full flex">
+        {/* 左侧图表区域 */}
         <div
           className="h-full overflow-hidden"
           style={{
             width: `${leftPanelWidth}%`,
-            minWidth: '50%',
-            maxWidth: '90%'
+            minWidth: "50%",
+            maxWidth: "90%",
+            position: "relative",
           }}
         >
-          <div className="h-full flex flex-col">
-            {isLoadingCandleData && (
-              <div className={`absolute inset-0 z-50 flex items-center justify-center ${isDark ? 'bg-gray-900/90' : 'bg-white/90'}`}>
-                <div className={`p-6 rounded-xl shadow-xl ${isDark ? 'bg-gray-800' : 'bg-white'}`}>
-                  <div className="flex flex-col items-center">
-                    <svg className="animate-spin h-8 w-8 mb-4 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    <span className={`text-lg font-medium mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                      {locale === 'cn' ? `正在加载 ${selectedPair} 数据...` : `Loading ${selectedPair} data...`}
-                    </span>
-                    <span className={`text-sm mb-4 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                      {TIMEFRAME_CONFIGS[currentTimeframe] ? TIMEFRAME_CONFIGS[currentTimeframe].description(locale) : `Timeframe: ${currentTimeframe}`}
-                    </span>
-                    <div className={`w-64 h-2 rounded-full overflow-hidden ${isDark ? 'bg-gray-700' : 'bg-gray-200'}`}>
-                      <div
-                        className="h-full bg-blue-500 transition-all duration-300 ease-out"
-                        style={{ width: `${progress}%` }}
-                      ></div>
-                    </div>
-                    <span className={`text-xs mt-2 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                      {progress}%
-                    </span>
-                  </div>
-                </div>
-              </div>
-            )}
-            {candleDataError && (
-              <div className={`absolute top-4 right-4 z-50 p-3 rounded-lg ${isDark ? 'bg-red-900/90 text-red-200' : 'bg-red-100 text-red-800'}`}>
-                <div className="flex items-center">
-                  <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                  </svg>
-                  {candleDataError}
-                </div>
-              </div>
-            )}
-            <CandleView
-              data={getDisplayData()}
-              title={getCandleViewTitle()}
-              theme={isDark ? 'dark' : 'light'}
-              i18n={getCandleViewI18n()}
-              height={candleViewHeight}
-              leftpanel={true}
-              timeframe={candleViewTimeframe}
-              toppanel={true}
-              markData={markData}
-              ai={true}
-              isCloseInternalTimeFrameCalculation={true}
-              timeframeCallbacks={{
-                "1s": async () => {
-                  if (selectedPair) {
-                    await fetchCandleDataByTimeframe(selectedPair, "1s");
-                  }
-                },
-                "5s": async () => {
-                  if (selectedPair) {
-                    await fetchCandleDataByTimeframe(selectedPair, "5s");
-                  }
-                },
-                "15s": async () => {
-                  if (selectedPair) {
-                    await fetchCandleDataByTimeframe(selectedPair, "15s");
-                  }
-                },
-                "30s": async () => {
-                  if (selectedPair) {
-                    await fetchCandleDataByTimeframe(selectedPair, "30s");
-                  }
-                },
-                "1m": async () => {
-                  if (selectedPair) {
-                    await fetchCandleDataByTimeframe(selectedPair, "1m");
-                  }
-                },
-                "3m": async () => {
-                  if (selectedPair) {
-                    await fetchCandleDataByTimeframe(selectedPair, "3m");
-                  }
-                },
-                "5m": async () => {
-                  if (selectedPair) {
-                    await fetchCandleDataByTimeframe(selectedPair, "5m");
-                  }
-                },
-                "15m": async () => {
-                  if (selectedPair) {
-                    await fetchCandleDataByTimeframe(selectedPair, "15m");
-                  }
-                },
-                "30m": async () => {
-                  if (selectedPair) {
-                    await fetchCandleDataByTimeframe(selectedPair, "30m");
-                  }
-                },
-                "45m": async () => {
-                  if (selectedPair) {
-                    await fetchCandleDataByTimeframe(selectedPair, "45m");
-                  }
-                },
-                "1H": async () => {
-                  if (selectedPair) {
-                    await fetchCandleDataByTimeframe(selectedPair, "1H");
-                  }
-                },
-                "2H": async () => {
-                  if (selectedPair) {
-                    await fetchCandleDataByTimeframe(selectedPair, "2H");
-                  }
-                },
-                "3H": async () => {
-                  if (selectedPair) {
-                    await fetchCandleDataByTimeframe(selectedPair, "3H");
-                  }
-                },
-                "4H": async () => {
-                  if (selectedPair) {
-                    await fetchCandleDataByTimeframe(selectedPair, "4H");
-                  }
-                },
-                "6H": async () => {
-                  if (selectedPair) {
-                    await fetchCandleDataByTimeframe(selectedPair, "6H");
-                  }
-                },
-                "8H": async () => {
-                  if (selectedPair) {
-                    await fetchCandleDataByTimeframe(selectedPair, "8H");
-                  }
-                },
-                "12H": async () => {
-                  if (selectedPair) {
-                    await fetchCandleDataByTimeframe(selectedPair, "12H");
-                  }
-                },
-                "1D": async () => {
-                  if (selectedPair) {
-                    await fetchCandleDataByTimeframe(selectedPair, "1D");
-                  }
-                },
-                "3D": async () => {
-                  if (selectedPair) {
-                    await fetchCandleDataByTimeframe(selectedPair, "3D");
-                  }
-                },
-                "1W": async () => {
-                  if (selectedPair) {
-                    await fetchCandleDataByTimeframe(selectedPair, "1W");
-                  }
-                },
-                "2W": async () => {
-                  if (selectedPair) {
-                    await fetchCandleDataByTimeframe(selectedPair, "2W");
-                  }
-                },
-                "1M": async () => {
-                  if (selectedPair) {
-                    await fetchCandleDataByTimeframe(selectedPair, "1M");
-                  }
-                },
-                "3M": async () => {
-                  if (selectedPair) {
-                    await fetchCandleDataByTimeframe(selectedPair, "3M");
-                  }
-                },
-                "6M": async () => {
-                  if (selectedPair) {
-                    await fetchCandleDataByTimeframe(selectedPair, "6M");
-                  }
-                }
-              }}
-              aiconfigs={[
-                {
-                  proxyUrl: '/api',
-                  brand: 'aliyun',
-                  model: 'qwen-turbo',
-                },
-                {
-                  proxyUrl: '/api',
-                  brand: 'deepseek',
-                  model: 'deepseek-chat',
-                },
-              ]}
-            />
-          </div>
+          <div ref={containerRef} className="w-full h-full" />
         </div>
+
+        {/* 分割线 */}
         <div
-          className={`w-2 h-full cursor-col-resize relative group transition-colors duration-200 ${isDark ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-300 hover:bg-gray-400'}`}
+          className={`w-2 h-full cursor-col-resize relative group transition-colors duration-200 ${isDark ? "bg-gray-700 hover:bg-gray-600" : "bg-gray-300 hover:bg-gray-400"}`}
           onMouseDown={startResizing}
         >
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className={`w-1 h-8 rounded transition-colors duration-200 ${getDividerHandleColor()}`}></div>
+            <div
+              className={`w-1 h-8 rounded transition-colors duration-200 ${getDividerHandleColor()}`}
+            />
           </div>
         </div>
+
+        {/* 右侧面板 */}
         <div
           className="h-full overflow-hidden flex flex-col"
           style={{
             width: `${100 - leftPanelWidth}%`,
-            minWidth: '20%'
+            minWidth: "20%",
           }}
         >
           <div className="flex-1 overflow-hidden relative">
-            <div className={`absolute inset-0 overflow-y-auto ${isDark ? 'scrollbar-dark' : 'scrollbar-light'}`}>
+            <div
+              className={`absolute inset-0 overflow-y-auto ${isDark ? "scrollbar-dark" : "scrollbar-light"}`}
+            >
               <div className="p-0">
                 <div className="space-y-0">
                   {menuItems.map((item) => (
                     <div
                       key={item.id}
-                      className={`overflow-hidden transition-all duration-300 ${isDark ? 'bg-gray-800' : 'bg-gray-50'}`}
+                      className={`overflow-hidden transition-all duration-300 ${isDark ? "bg-gray-800" : "bg-gray-50"}`}
                     >
                       <div
-                        className={`px-3 py-2 flex justify-between items-center cursor-pointer transition-colors duration-200 ${isDark
-                          ? 'hover:bg-gray-700 active:bg-gray-600 border-gray-700'
-                          : 'hover:bg-gray-200 active:bg-gray-300 border-gray-300'
-                          } border-b `}
+                        className={`px-3 py-2 flex justify-between items-center cursor-pointer transition-colors duration-200 ${
+                          isDark
+                            ? "hover:bg-gray-700 active:bg-gray-600 border-gray-700"
+                            : "hover:bg-gray-200 active:bg-gray-300 border-gray-300"
+                        } border-b`}
                         onClick={() => toggleMenu(item.id)}
                       >
-                        <span className={`text-base font-medium ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>
+                        <span
+                          className={`text-base font-medium ${isDark ? "text-gray-200" : "text-gray-800"}`}
+                        >
                           {item.title}
                         </span>
                         <svg
-                          className={`w-4 h-4 transition-transform duration-300 ${expandedMenus.includes(item.id) ? 'rotate-180' : ''
-                            } ${isDark ? 'text-gray-400' : 'text-gray-600'}`}
+                          className={`w-4 h-4 transition-transform duration-300 ${
+                            expandedMenus.includes(item.id) ? "rotate-180" : ""
+                          } ${isDark ? "text-gray-400" : "text-gray-600"}`}
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
                         >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 9l-7 7-7-7"
+                          />
                         </svg>
                       </div>
                       {expandedMenus.includes(item.id) && (
@@ -1805,7 +2136,8 @@ export default function FullViewportComponent() {
             scrollbar-color: #4a5568 #1a202c;
           }
         }
-        .scrollbar-light, .scrollbar-dark {
+        .scrollbar-light,
+        .scrollbar-dark {
           scroll-behavior: smooth;
           -webkit-overflow-scrolling: touch;
         }

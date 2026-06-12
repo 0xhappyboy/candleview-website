@@ -42,30 +42,30 @@ export default function LanguageSwitcher() {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 p-2 rounded-lg bg-secondary hover:bg-accent transition-colors border"
+        className="flex items-center gap-1.5 p-1.5 rounded-md bg-muted hover:bg-muted/80 transition-colors border border-border"
         aria-label="Select language"
       >
-        <Globe className="w-5 h-5" />
-        <span className="hidden sm:inline text-sm font-medium">
+        <Globe className="w-3.5 h-3.5 text-muted-foreground" />
+        <span className="hidden sm:inline text-[11px] font-medium text-muted-foreground">
           {currentLanguage.nativeName}
         </span>
       </button>
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-48 rounded-lg border bg-card shadow-lg z-50">
+        <div className="absolute right-0 mt-1 w-36 rounded-md border border-border bg-card shadow-md z-50">
           <div className="py-1">
             {languages.map((language) => (
               <button
                 key={language.code}
                 onClick={() => handleLanguageChange(language.code)}
-                className={`w-full px-4 py-2 text-left text-sm transition-colors ${
+                className={`w-full px-3 py-1.5 text-left text-[11px] transition-colors ${
                   locale === language.code
                     ? 'bg-primary/10 text-primary font-medium'
-                    : 'hover:bg-accent'
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                 }`}
               >
                 <div className="flex items-center justify-between">
                   <span>{language.nativeName}</span>
-                  <span className="text-xs text-muted-foreground">{language.name}</span>
+                  <span className="text-[10px] text-muted-foreground">{language.name}</span>
                 </div>
               </button>
             ))}

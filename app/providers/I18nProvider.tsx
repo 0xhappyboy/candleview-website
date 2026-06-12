@@ -16,22 +16,34 @@ interface I18nProviderProps {
   defaultLocale?: Locale;
 }
 
+function setLocaleCookie(locale: Locale) {
+  document.cookie = `preferredLocale=${locale}; path=/; max-age=31536000`;
+}
+
 export function I18nProvider({ children, defaultLocale = 'en' }: I18nProviderProps) {
-  const [locale, setLocale] = useState<Locale>(() => {
-    if (typeof window !== 'undefined') {
-      const savedLocale = localStorage.getItem('preferredLocale') as Locale;
-      if (savedLocale && (savedLocale === 'en' || savedLocale === 'cn')) {
-        return savedLocale;
-      }
+  const [locale, setLocale] = useState<Locale>(defaultLocale);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    const cookieMatch = document.cookie.match(/preferredLocale=([^;]+)/);
+    let savedLocale = cookieMatch ? cookieMatch[1] as Locale : null;
+    if (!savedLocale) {
+      savedLocale = localStorage.getItem('preferredLocale') as Locale;
     }
-    return defaultLocale;
-  });
+    if (savedLocale && (savedLocale === 'en' || savedLocale === 'cn')) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setLocale(savedLocale);
+      setLocaleCookie(savedLocale);
+    }
+    setMounted(true);
+  }, []);
+
   const handleSetLocale = (newLocale: Locale) => {
     setLocale(newLocale);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('preferredLocale', newLocale);
-    }
+    localStorage.setItem('preferredLocale', newLocale);
+    setLocaleCookie(newLocale);
   };
+
   return (
     <I18nContext.Provider value={{ locale, setLocale: handleSetLocale }}>
       {children}

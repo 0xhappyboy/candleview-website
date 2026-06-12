@@ -100,47 +100,46 @@ export default function FloatingNav({ sections }: FloatingNavProps) {
   return (
     <div
       ref={navRef}
-      className="fixed right-6 top-1/2 -translate-y-1/2 z-50"
+      className="fixed right-4 top-1/2 -translate-y-1/2 z-50"
     >
       <div
         className={`
-          flex flex-col items-center gap-3 p-3
+          flex flex-col items-center gap-2 p-2
           bg-background/90 backdrop-blur-md
-          rounded-2xl shadow-lg border
+          rounded-lg shadow-md border border-border/50
           transition-all duration-300
-          ${isOpen ? "w-48" : "w-12"}
-          border-border/50
+          ${isOpen ? "w-40" : "w-10"}
         `}
       >
         <button
           onClick={scrollToTop}
-          className="p-2 rounded-full bg-secondary hover:bg-secondary/80 transition-colors group relative"
+          className="p-1.5 rounded-md bg-muted hover:bg-muted/80 transition-colors group relative"
           title={t("FloatingNav.backToTop")}
         >
-          <ChevronUp className="w-4 h-4 text-secondary-foreground" />
+          <ChevronUp className="w-3.5 h-3.5 text-muted-foreground" />
           {isOpen && (
-            <span className="absolute left-full ml-2 px-2 py-1 bg-popover text-popover-foreground text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-md border">
+            <span className="absolute left-full ml-2 px-2 py-0.5 bg-popover text-popover-foreground text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-sm border border-border">
               {t("FloatingNav.backToTop")}
             </span>
           )}
         </button>
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="p-2 rounded-full bg-secondary hover:bg-secondary/80 transition-colors group relative"
+          className="p-1.5 rounded-md bg-muted hover:bg-muted/80 transition-colors group relative"
           title={isOpen ? t("FloatingNav.collapse") : t("FloatingNav.expand")}
         >
           {isOpen ? (
-            <ChevronRight className="w-4 h-4 text-secondary-foreground" />
+            <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />
           ) : (
-            <ChevronLeft className="w-4 h-4 text-secondary-foreground" />
+            <ChevronLeft className="w-3.5 h-3.5 text-muted-foreground" />
           )}
           {!isOpen && (
-            <span className="absolute left-full ml-2 px-2 py-1 bg-popover text-popover-foreground text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-md border">
+            <span className="absolute left-full ml-2 px-2 py-0.5 bg-popover text-popover-foreground text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-sm border border-border">
               {t("FloatingNav.expand")}
             </span>
           )}
         </button>
-        <nav className="flex flex-col gap-2 w-full">
+        <nav className="flex flex-col gap-1.5 w-full">
           {sections.map((section) => {
             const Icon = iconMap[section.id as keyof typeof iconMap] || Home;
             return (
@@ -149,19 +148,19 @@ export default function FloatingNav({ sections }: FloatingNavProps) {
                 onClick={() => handleClick(section.id)}
                 className={`
                   flex items-center
-                  p-2 rounded-lg
+                  p-1.5 rounded-md
                   transition-all duration-200
-                  ${isOpen ? "justify-start gap-3" : "justify-center"}
+                  ${isOpen ? "justify-start gap-2" : "justify-center"}
                   ${activeSection === section.id
                     ? "bg-primary text-primary-foreground"
-                    : "hover:bg-accent text-foreground/80 hover:text-foreground"
+                    : "hover:bg-muted text-muted-foreground hover:text-foreground"
                   }
                 `}
                 title={t(section.labelKey)}
               >
-                <Icon className="w-4 h-4 flex-shrink-0" />
+                <Icon className="w-3.5 h-3.5 flex-shrink-0" />
                 {isOpen && (
-                  <span className="text-sm font-medium whitespace-nowrap">
+                  <span className="text-[11px] font-medium whitespace-nowrap">
                     {t(section.labelKey)}
                   </span>
                 )}

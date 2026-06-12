@@ -1,18 +1,19 @@
+// config.ts
 export const siteConfig = {
   name: '{siteName}',
   email: 'superhappyboy1995@gmail.com',
   metadata: {
     title: {
-      en: '🕯️CandleView | AI-Powered financial data visualization charts(KLine) with intelligent insights',
-      cn: '🕯️烛光视图 | 人工智能驱动的金融数据可视化图表(K线)与智能洞察引擎'
+      en: '🕯️CandleView | Professional time series data visualization and charting engine',
+      cn: '🕯️烛光视图 | 专业的时间序列数据可视化与图表绘制引擎'
     },
     description: {
-      en: 'An AI-enhanced data visualization charts(KLine) and draw graph engine for the financial industry with intelligent analysis capabilities.',
-      cn: '一款人工智能增强的金融数据可视化图表(K线)与图形绘制引擎，具备智能分析能力'
+      en: 'A high-performance data visualization charting engine for the financial industry, designed for time series data analysis.',
+      cn: '一款专为金融行业打造的高性能数据可视化图表引擎，专注于时间序列数据分析'
     },
     keywords: {
-      en: 'AI financial charts, intelligent trading, machine learning, real-time analytics, WebGL',
-      cn: 'AI金融图表, 智能交易, 机器学习, 实时分析, WebGL'
+      en: 'time series, financial charts, data visualization, candlestick, technical analysis, WebGL',
+      cn: '时间序列, 金融图表, 数据可视化, K线图, 技术分析, WebGL'
     }
   },
   logo: {
@@ -28,19 +29,19 @@ export const siteConfig = {
   preview: {
     title: {
       main: {
-        en: 'AI-Powered Component Preview',
-        cn: 'AI增强组件预览'
+        en: 'Professional Chart Preview',
+        cn: '专业图表预览'
       },
       highlight: {
-        en: 'AI-Powered',
-        cn: 'AI增强'
+        en: 'Professional',
+        cn: '专业'
       },
       className: 'text-3xl sm:text-4xl font-bold text-center mb-6 tracking-tight'
     },
     subtitle: {
       text: {
-        en: 'Experience intelligent chart analysis with AI-driven insights in real-time',
-        cn: '实时体验AI驱动的智能图表分析与洞察'
+        en: 'Experience professional-grade financial chart visualization for time series data analysis',
+        cn: '体验专业级的金融时间序列数据可视化图表'
       },
       className: 'text-lg text-muted-foreground max-w-2xl text-center mb-6 leading-relaxed'
     },
@@ -59,19 +60,19 @@ export const siteConfig = {
     },
     title: {
       main: {
-        en: 'Intelligent Trading Experiences Powered by AI',
-        cn: 'AI驱动的智能交易体验'
+        en: 'Professional Time Series Data Visualization',
+        cn: '专业的时间序列数据可视化'
       },
       highlight: {
-        en: 'AI',
-        cn: 'AI驱动'
+        en: 'Time Series',
+        cn: '时间序列'
       },
       className: 'text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 tracking-tight'
     },
     description: {
       text: {
-        en: 'An AI-enhanced high-performance, real-time data visualization platform with intelligent pattern recognition and predictive analytics for financial markets.',
-        cn: '一个人工智能增强的高性能实时数据可视化平台，具备金融市场的智能模式识别与预测分析能力'
+        en: 'A high-performance, real-time data visualization platform designed specifically for financial time series data and technical analysis.',
+        cn: '一个专为金融时间序列数据和技术分析打造的高性能实时数据可视化平台'
       },
       className: 'text-xl text-muted-foreground max-w-3xl mx-auto mb-6 leading-relaxed'
     },
@@ -102,31 +103,31 @@ export const siteConfig = {
     },
     metrics: [
       {
-        value: 'AI模式识别',
+        value: '百万级数据点',
         label: {
-          en: 'AI Pattern Recognition',
-          cn: 'AI模式识别'
+          en: 'Millions of Data Points',
+          cn: '百万级数据点'
         }
       },
       {
-        value: '智能预测',
+        value: '毫秒级响应',
         label: {
-          en: 'Intelligent Forecasting',
-          cn: '智能预测'
+          en: 'Millisecond Response',
+          cn: '毫秒级响应'
         }
       },
       {
-        value: '机器学习',
+        value: '多时间框架',
         label: {
-          en: 'Machine Learning',
-          cn: '机器学习'
+          en: 'Multi-Timeframe',
+          cn: '多时间框架'
         }
       },
       {
-        value: 'AI指标',
+        value: '技术指标',
         label: {
-          en: 'AI Indicators',
-          cn: 'AI技术指标'
+          en: 'Technical Indicators',
+          cn: '技术指标'
         }
       }
     ],
@@ -166,8 +167,8 @@ export const siteConfig = {
         imageUrl: 'https://raw.githubusercontent.com/0xhappyboy/candleview/main/assets/logo/logo_50x50.jpeg',
       },
       description: {
-        en: 'An AI-enhanced data visualization charts(KLine) and draw graph engine with intelligent financial analysis.',
-        cn: '一款人工智能增强的金融数据可视化图表(K线)与智能分析引擎'
+        en: 'A professional time series data visualization and charting engine for the financial industry.',
+        cn: '一款专为金融行业打造的专业时间序列数据可视化与图表绘制引擎'
       }
     },
     navSections: [
@@ -302,30 +303,4 @@ export const siteConfig = {
   container: {
     className: 'container mx-auto px-4 sm:px-6 lg:px-8',
   },
-  aiDialog: {
-    title: {
-      en: "AI Assistant",
-      cn: "AI助手"
-    },
-    description: {
-      en: "Ask me anything about data analysis",
-      cn: "向我询问任何关于数据分析的问题"
-    },
-    placeholder: {
-      en: "Type your message here...",
-      cn: "在这里输入您的问题..."
-    },
-    sendButton: {
-      en: "Send",
-      cn: "发送"
-    },
-    clearButton: {
-      en: "Clear",
-      cn: "清空"
-    },
-    toggleButton: {
-      en: "Toggle AI Chat",
-      cn: "切换AI对话"
-    }
-  }
 } as const;

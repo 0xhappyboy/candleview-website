@@ -29,62 +29,38 @@ export default function Features() {
   };
 
   const features: Feature[] = [
-    { 
-      icon: Zap, 
-      titleKey: 'plugAndPlay', 
-      descriptionKey: 'plugAndPlayDesc' 
-    },
-    { 
-      icon: Database, 
-      titleKey: 'dataDriven', 
-      descriptionKey: 'dataDrivenDesc' 
-    },
-    { 
-      icon: Cpu, 
-      titleKey: 'lowMemory', 
-      descriptionKey: 'lowMemoryDesc' 
-    },
-    { 
-      icon: ChartBar, 
-      titleKey: 'professionalCharts', 
-      descriptionKey: 'professionalChartsDesc' 
-    },
-    { 
-      icon: Smartphone, 
-      titleKey: 'multiPlatform', 
-      descriptionKey: 'multiPlatformDesc' 
-    },
-    { 
-      icon: Code, 
-      titleKey: 'highExtensibility', 
-      descriptionKey: 'highExtensibilityDesc' 
-    },
+    { icon: Zap, titleKey: 'plugAndPlay', descriptionKey: 'plugAndPlayDesc' },
+    { icon: Database, titleKey: 'dataDriven', descriptionKey: 'dataDrivenDesc' },
+    { icon: Cpu, titleKey: 'lowMemory', descriptionKey: 'lowMemoryDesc' },
+    { icon: ChartBar, titleKey: 'professionalCharts', descriptionKey: 'professionalChartsDesc' },
+    { icon: Smartphone, titleKey: 'multiPlatform', descriptionKey: 'multiPlatformDesc' },
+    { icon: Code, titleKey: 'highExtensibility', descriptionKey: 'highExtensibilityDesc' },
   ];
 
   return (
-    <section className="py-10 sm:py-10">
+    <section className="py-12">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl text-foreground">
             {t('title')}
           </h2>
-          <p className="mt-4 text-lg text-muted-foreground">
+          <p className="mt-2 text-sm text-muted-foreground">
             {t('subtitle')}
           </p>
         </div>
-        <div className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-8 sm:mt-20 lg:mx-0 lg:max-w-none lg:grid-cols-3">
+        <div className="mx-auto mt-10 grid max-w-2xl grid-cols-1 gap-5 sm:mt-12 lg:mx-0 lg:max-w-none lg:grid-cols-3">
           {features.map((feature, index) => (
             <div
               key={index}
-              className="relative rounded-2xl border bg-card p-8 transition-all hover:shadow-lg hover:-translate-y-1"
+              className="relative rounded-lg border border-border bg-muted/30 p-5 transition-all hover:border-muted-foreground/30 hover:-translate-y-0.5"
             >
-              <div className="mb-6 inline-flex items-center justify-center rounded-lg bg-primary/10 p-3">
-                <feature.icon className="h-6 w-6 text-primary" />
+              <div className="mb-3 inline-flex items-center justify-center rounded-md bg-primary/10 p-2">
+                <feature.icon className="h-4 w-4 text-primary" />
               </div>
-              <h3 className="text-xl font-bold">
+              <h3 className="text-sm font-semibold text-foreground">
                 {t(feature.titleKey)}
               </h3>
-              <p className="mt-3 text-muted-foreground">
+              <p className="mt-1.5 text-[11px] text-muted-foreground leading-relaxed">
                 {t(feature.descriptionKey)}
               </p>
             </div>

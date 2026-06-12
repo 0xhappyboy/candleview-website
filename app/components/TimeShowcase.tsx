@@ -122,25 +122,19 @@ export default function TimeShowcase() {
         {
             titleKey: 'TimeShowcase.globalCoverage',
             descKey: 'TimeShowcase.globalCoverageDesc',
-            gradient: 'from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20',
             color: 'text-blue-600 dark:text-blue-400',
-            bgColor: 'bg-blue-100 dark:bg-blue-900/30',
             icon: Globe
         },
         {
             titleKey: 'TimeShowcase.multiTimeframe',
             descKey: 'TimeShowcase.multiTimeframeDesc',
-            gradient: 'from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20',
             color: 'text-green-600 dark:text-green-400',
-            bgColor: 'bg-green-100 dark:bg-green-900/30',
             icon: CalendarDays
         },
         {
             titleKey: 'TimeShowcase.realTimeSync',
             descKey: 'TimeShowcase.realTimeSyncDesc',
-            gradient: 'from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20',
             color: 'text-purple-600 dark:text-purple-400',
-            bgColor: 'bg-purple-100 dark:bg-purple-900/30',
             icon: Zap
         }
     ];
@@ -148,83 +142,74 @@ export default function TimeShowcase() {
     const scrollbarStyles = `
     .custom-scrollbar {
       scrollbar-width: thin;
-      scrollbar-color: #94a3b8 #f1f5f9;
+      scrollbar-color: #cbd5e0 #f7fafc;
     }
-    
     .custom-scrollbar::-webkit-scrollbar {
       width: 6px;
       height: 6px;
     }
-    
     .custom-scrollbar::-webkit-scrollbar-track {
-      background: #f1f5f9;
+      background: #f7fafc;
       border-radius: 10px;
     }
-    
     .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: #94a3b8;
+      background: #cbd5e0;
       border-radius: 10px;
     }
-    
     .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-      background: #64748b;
+      background: #a0aec0;
     }
-    
-    /* Dark mode styles */
     .dark .custom-scrollbar {
-      scrollbar-color: #475569 #1e293b;
+      scrollbar-color: #4a5568 #1a202c;
     }
-    
     .dark .custom-scrollbar::-webkit-scrollbar-track {
-      background: #1e293b;
+      background: #1a202c;
     }
-    
     .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: #475569;
+      background: #4a5568;
     }
-    
     .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-      background: #64748b;
+      background: #2d3748;
     }
   `;
 
     return (
         <>
             <style jsx global>{scrollbarStyles}</style>
-            <section className="py-10 sm:py-10">
+            <section className="py-12">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="mx-auto max-w-2xl text-center">
-                        <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+                        <h2 className="text-2xl font-bold tracking-tight sm:text-3xl text-foreground">
                             {t('TimeShowcase.title')}
                         </h2>
-                        <p className="mt-4 text-lg text-muted-foreground">
+                        <p className="mt-2 text-sm text-muted-foreground">
                             {t('TimeShowcase.subtitle')}
                         </p>
                     </div>
-                    <div className="mx-auto mt-16 grid max-w-7xl grid-cols-1 lg:grid-cols-2 gap-8">
-                        <div className="bg-card rounded-2xl border p-6">
-                            <div className="flex items-center gap-3 mb-6">
-                                <div className="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-blue-500 to-cyan-500 p-2">
-                                    <Clock className="h-5 w-5 text-white" />
+                    <div className="mx-auto mt-10 grid max-w-7xl grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div className="bg-muted/30 border border-border rounded-lg p-5">
+                            <div className="flex items-center gap-2 mb-4">
+                                <div className="inline-flex items-center justify-center rounded-md bg-gradient-to-r from-blue-500 to-cyan-500 p-1.5">
+                                    <Clock className="h-4 w-4 text-white" />
                                 </div>
-                                <h3 className="text-xl font-bold">
+                                <h3 className="text-sm font-semibold text-foreground">
                                     {t('TimeShowcase.supportedTimeframes')}
                                 </h3>
                             </div>
-                            <div className="space-y-6 max-h-[400px] overflow-y-auto custom-scrollbar pr-2">
+                            <div className="space-y-4 max-h-[360px] overflow-y-auto custom-scrollbar pr-2">
                                 {timeFrameCategories.map((category, categoryIndex) => (
-                                    <div key={categoryIndex} className="space-y-3">
-                                        <div className="flex items-center gap-2">
-                                            <div className="h-2 w-2 rounded-full bg-blue-500"></div>
-                                            <h4 className="font-semibold text-sm">
+                                    <div key={categoryIndex} className="space-y-2">
+                                        <div className="flex items-center gap-1.5">
+                                            <div className="h-1.5 w-1.5 rounded-full bg-blue-500"></div>
+                                            <h4 className="font-medium text-xs text-foreground">
                                                 {t(category.categoryKey)}
                                             </h4>
                                         </div>
-                                        <div className="flex flex-wrap gap-2">
+                                        <div className="flex flex-wrap gap-1.5">
                                             {category.timeFrames.map((timeFrameKey, timeFrameIndex) => (
                                                 <span
                                                     key={timeFrameIndex}
-                                                    className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-700"
+                                                    className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-muted text-muted-foreground border border-border"
                                                 >
                                                     {t(timeFrameKey)}
                                                 </span>
@@ -233,23 +218,23 @@ export default function TimeShowcase() {
                                     </div>
                                 ))}
                             </div>
-                            <div className="mt-6 pt-6 border-t dark:border-gray-700">
-                                <p className="text-xs text-gray-500 dark:text-gray-400">
+                            <div className="mt-4 pt-3 border-t border-border">
+                                <p className="text-[10px] text-muted-foreground">
                                     {t('TimeShowcase.timeframeFeatures')}
                                 </p>
                             </div>
                         </div>
 
-                        <div className="bg-card rounded-2xl border p-6">
-                            <div className="flex items-center gap-3 mb-6">
-                                <div className="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-orange-500 to-amber-500 p-2">
-                                    <Globe className="h-5 w-5 text-white" />
+                        <div className="bg-muted/30 border border-border rounded-lg p-5">
+                            <div className="flex items-center gap-2 mb-4">
+                                <div className="inline-flex items-center justify-center rounded-md bg-gradient-to-r from-orange-500 to-amber-500 p-1.5">
+                                    <Globe className="h-4 w-4 text-white" />
                                 </div>
-                                <h3 className="text-xl font-bold">
+                                <h3 className="text-sm font-semibold text-foreground">
                                     {t('TimeShowcase.supportedTimezones')}
                                 </h3>
                             </div>
-                            <div className="space-y-6 max-h-[400px] overflow-y-auto custom-scrollbar pr-2">
+                            <div className="space-y-4 max-h-[360px] overflow-y-auto custom-scrollbar pr-2">
                                 {(() => {
                                     const regions = timeZones.reduce((acc, tz) => {
                                         const region = t(tz.regionKey);
@@ -258,26 +243,26 @@ export default function TimeShowcase() {
                                         return acc;
                                     }, {} as Record<string, TimeZone[]>);
                                     return Object.entries(regions).map(([region, zoneList], regionIndex) => (
-                                        <div key={regionIndex} className="space-y-3">
-                                            <div className="flex items-center gap-2">
-                                                <div className="h-2 w-2 rounded-full bg-orange-500"></div>
-                                                <h4 className="font-semibold text-sm">
+                                        <div key={regionIndex} className="space-y-2">
+                                            <div className="flex items-center gap-1.5">
+                                                <div className="h-1.5 w-1.5 rounded-full bg-orange-500"></div>
+                                                <h4 className="font-medium text-xs text-foreground">
                                                     {region}
                                                 </h4>
                                             </div>
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-1.5">
                                                 {zoneList.map((timeZone, tzIndex) => (
                                                     <div
                                                         key={tzIndex}
-                                                        className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 px-3 py-2 rounded-lg bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 border border-orange-200 dark:border-orange-700 min-w-0"
+                                                        className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 px-2 py-1.5 rounded-md bg-muted/50 border border-border min-w-0"
                                                     >
-                                                        <div className="flex items-center gap-2 min-w-0">
-                                                            <div className="h-2 w-2 rounded-full bg-orange-300 flex-shrink-0"></div>
-                                                            <span className="font-medium text-sm text-gray-700 dark:text-gray-300 truncate">
+                                                        <div className="flex items-center gap-1.5 min-w-0">
+                                                            <div className="h-1.5 w-1.5 rounded-full bg-orange-300 flex-shrink-0"></div>
+                                                            <span className="font-medium text-[11px] text-foreground truncate">
                                                                 {timeZone.name}
                                                             </span>
                                                         </div>
-                                                        <span className="text-xs text-gray-500 dark:text-gray-400 truncate sm:ml-auto">
+                                                        <span className="text-[10px] text-muted-foreground truncate sm:ml-auto">
                                                             {timeZone.timeZone}
                                                         </span>
                                                     </div>
@@ -287,29 +272,29 @@ export default function TimeShowcase() {
                                     ));
                                 })()}
                             </div>
-                            <div className="mt-6 pt-6 border-t dark:border-gray-700">
-                                <p className="text-xs text-gray-500 dark:text-gray-400">
+                            <div className="mt-4 pt-3 border-t border-border">
+                                <p className="text-[10px] text-muted-foreground">
                                     {t('TimeShowcase.timezoneFeatures')}
                                 </p>
                             </div>
                         </div>
                     </div>
 
-                    <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-4">
                         {features.map((feature, index) => (
                             <div
                                 key={index}
-                                className={`bg-gradient-to-br ${feature.gradient} rounded-xl p-6 border border-transparent dark:border-gray-700`}
+                                className="bg-muted/30 border border-border rounded-lg p-4"
                             >
-                                <div className="flex items-center gap-3 mb-4">
-                                    <div className={`inline-flex items-center justify-center rounded-lg p-2 ${feature.bgColor}`}>
-                                        <feature.icon className={`h-5 w-5 ${feature.color}`} />
+                                <div className="flex items-center gap-2 mb-2">
+                                    <div className="inline-flex items-center justify-center rounded-md p-1.5 bg-muted">
+                                        <feature.icon className={`h-4 w-4 ${feature.color}`} />
                                     </div>
-                                    <div className={`${feature.color} font-semibold`}>
+                                    <div className={`${feature.color} font-medium text-xs`}>
                                         {t(feature.titleKey)}
                                     </div>
                                 </div>
-                                <p className="text-sm text-gray-600 dark:text-gray-300">
+                                <p className="text-[11px] text-muted-foreground leading-relaxed">
                                     {t(feature.descKey)}
                                 </p>
                             </div>

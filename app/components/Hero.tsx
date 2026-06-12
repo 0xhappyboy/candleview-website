@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useEffect, useRef, useState } from 'react';
-import { siteConfig } from '../config';
-import { Github, Star } from 'lucide-react';
-import { useI18n } from '../providers/I18nProvider';
-import { useVersion } from '../hooks/UseVersion';
-import Link from 'next/link';
+import { useEffect, useRef, useState } from "react";
+import { siteConfig } from "../config";
+import { Github, Star } from "lucide-react";
+import { useI18n } from "../providers/I18nProvider";
+import { useVersion } from "../hooks/UseVersion";
+import Link from "next/link";
 
 interface GitHubStats {
   stars: number;
@@ -48,14 +48,17 @@ const renderHighlightedTitle = (title: string, highlight: string) => {
   );
 };
 
-const getLocalizedContent = (config: LocalizableConfig, locale: string): string => {
-  if (typeof config === 'object') {
+const getLocalizedContent = (
+  config: LocalizableConfig,
+  locale: string,
+): string => {
+  if (typeof config === "object") {
     const obj = config as Record<string, string>;
     if (obj[locale]) {
       return obj[locale];
     }
-    if (obj['en']) {
-      return obj['en'];
+    if (obj["en"]) {
+      return obj["en"];
     }
   }
   return config as string;
@@ -70,63 +73,75 @@ export default function Hero() {
   const [githubStats, setGithubStats] = useState<GitHubStats>({
     stars: 0,
     loading: true,
-    error: false
+    error: false,
   });
-  const [activeTab, setActiveTab] = useState<'npm' | 'yarn' | 'pnpm'>('npm');
+  const [activeTab, setActiveTab] = useState<"npm" | "yarn" | "pnpm">("npm");
   const [showCopySuccess, setShowCopySuccess] = useState(false);
   const copyTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const hero = siteConfig.hero;
-  // const localizedAnnouncementLabel = getLocalizedContent(hero.announcement.label, locale);
   const versionInfo = useVersion();
   const localizedAnnouncementLabel = getLocalizedContent(
     versionInfo.loading
-      ? ''
+      ? ""
       : {
-        en: `${versionInfo.latest} Launch`,
-        cn: `${versionInfo.latest} 正式发布`
-      },
-    locale
+          en: `${versionInfo.latest} Launch`,
+          cn: `${versionInfo.latest} 正式发布`,
+        },
+    locale,
   );
   const localizedTitleMain = getLocalizedContent(hero.title.main, locale);
-  const localizedTitleHighlight = getLocalizedContent(hero.title.highlight, locale);
-  const localizedDescriptionText = getLocalizedContent(hero.description.text, locale);
-  const localizedPrimaryButtonLabel = getLocalizedContent(hero.buttons.primary.label, locale);
-  const localizedSecondaryButtonLabel = getLocalizedContent(hero.buttons.secondary.label, locale);
-  const localizedMarketButtonLabel = getLocalizedContent(hero.buttons.market.label, locale);
-
+  const localizedTitleHighlight = getLocalizedContent(
+    hero.title.highlight,
+    locale,
+  );
+  const localizedDescriptionText = getLocalizedContent(
+    hero.description.text,
+    locale,
+  );
+  const localizedPrimaryButtonLabel = getLocalizedContent(
+    hero.buttons.primary.label,
+    locale,
+  );
+  const localizedSecondaryButtonLabel = getLocalizedContent(
+    hero.buttons.secondary.label,
+    locale,
+  );
+  const localizedMarketButtonLabel = getLocalizedContent(
+    hero.buttons.market.label,
+    locale,
+  );
   const installationCommands = {
-    npm: 'npm i candleview',
-    yarn: 'yarn add candleview',
-    pnpm: 'pnpm add candleview'
+    npm: "npm i @candleview/core",
+    yarn: "yarn add @candleview/core",
+    pnpm: "pnpm add @candleview/core",
   };
-
   const copyMessages = {
     en: {
-      copy: 'Copy',
-      copied: 'Copied!'
+      copy: "Copy",
+      copied: "Copied!",
     },
     cn: {
-      copy: '复制',
-      copied: '已复制!'
-    }
+      copy: "复制",
+      copied: "已复制!",
+    },
   };
-
-  const currentCopyMessages = copyMessages[locale as keyof typeof copyMessages] || copyMessages.en;
-
+  const currentCopyMessages =
+    copyMessages[locale as keyof typeof copyMessages] || copyMessages.en;
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(installationCommands[activeTab]).then(() => {
-      setShowCopySuccess(true);
-      if (copyTimeoutRef.current) {
-        clearTimeout(copyTimeoutRef.current);
-      }
-      copyTimeoutRef.current = setTimeout(() => {
-        setShowCopySuccess(false);
-      }, 2000);
-    }).catch(err => {
-    });
+    navigator.clipboard
+      .writeText(installationCommands[activeTab])
+      .then(() => {
+        setShowCopySuccess(true);
+        if (copyTimeoutRef.current) {
+          clearTimeout(copyTimeoutRef.current);
+        }
+        copyTimeoutRef.current = setTimeout(() => {
+          setShowCopySuccess(false);
+        }, 2000);
+      })
+      .catch((err) => {});
   };
-
   useEffect(() => {
     return () => {
       if (copyTimeoutRef.current) {
@@ -134,7 +149,6 @@ export default function Hero() {
       }
     };
   }, []);
-
   const fetchGitHubStars = async () => {
     try {
       const githubUrl = hero.buttons.secondary.href;
@@ -148,25 +162,27 @@ export default function Hero() {
         setGithubStats({
           stars: data.stargazers_count || 0,
           loading: false,
-          error: false
+          error: false,
         });
       } else {
-        setGithubStats(prev => ({ ...prev, loading: false, error: true }));
+        setGithubStats((prev) => ({ ...prev, loading: false, error: true }));
       }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      setGithubStats(prev => ({ ...prev, loading: false, error: true }));
+      setGithubStats((prev) => ({ ...prev, loading: false, error: true }));
     }
   };
-
   useEffect(() => {
     if (hero.buttons.secondary.showStars) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       fetchGitHubStars();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hero.buttons.secondary.showStars]);
 
   useEffect(() => {
     const checkTheme = () => {
-      if (document.documentElement.classList.contains('dark')) {
+      if (document.documentElement.classList.contains("dark")) {
         setIsDark(true);
       } else {
         setIsDark(false);
@@ -176,7 +192,7 @@ export default function Hero() {
     const observer = new MutationObserver(checkTheme);
     observer.observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ['class'],
+      attributeFilter: ["class"],
     });
     return () => observer.disconnect();
   }, []);
@@ -184,26 +200,27 @@ export default function Hero() {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
+
     const themeColors = {
       dark: {
-        bg: 'rgba(0, 0, 0, 0.5)',
-        grid: 'rgba(255, 255, 255, 0.05)',
-        text: 'rgba(255, 255, 255, 0.6)',
-        up: '#10b981',
-        down: '#ef4444',
-        line: '#3b82f6',
-        glow: 'rgba(59, 130, 246, 0.1)',
+        bg: "rgba(0, 0, 0, 0.5)",
+        grid: "rgba(255, 255, 255, 0.05)",
+        text: "rgba(255, 255, 255, 0.6)",
+        up: "#10b981",
+        down: "#ef4444",
+        line: "#3b82f6",
+        glow: "rgba(59, 130, 246, 0.1)",
       },
       light: {
-        bg: 'rgba(255, 255, 255, 0.5)',
-        grid: 'rgba(0, 0, 0, 0.05)',
-        text: 'rgba(0, 0, 0, 0.6)',
-        up: '#059669',
-        down: '#dc2626',
-        line: '#2563eb',
-        glow: 'rgba(37, 99, 235, 0.1)',
+        bg: "rgba(255, 255, 255, 0.5)",
+        grid: "rgba(0, 0, 0, 0.05)",
+        text: "rgba(0, 0, 0, 0.6)",
+        up: "#059669",
+        down: "#dc2626",
+        line: "#2563eb",
+        glow: "rgba(37, 99, 235, 0.1)",
       },
     };
 
@@ -232,7 +249,9 @@ export default function Hero() {
     };
 
     const generateLiveCandle = (): CandleData => {
-      const lastCandle = candleDataRef.current[candleDataRef.current.length - 1] || { close: 100 };
+      const lastCandle = candleDataRef.current[
+        candleDataRef.current.length - 1
+      ] || { close: 100 };
       const basePrice = lastCandle.close;
       const volatility = 0.8;
       const time = Date.now() / 1000;
@@ -241,8 +260,10 @@ export default function Hero() {
       const change = sineWave + randomWalk;
       const open = lastCandle.close;
       const close = basePrice + change;
-      const high = Math.max(open, close) + Math.abs(change) * 3 + Math.random() * 0.8;
-      const low = Math.min(open, close) - Math.abs(change) * 3 - Math.random() * 0.8;
+      const high =
+        Math.max(open, close) + Math.abs(change) * 3 + Math.random() * 0.8;
+      const low =
+        Math.min(open, close) - Math.abs(change) * 3 - Math.random() * 0.8;
       return {
         open,
         high,
@@ -258,7 +279,7 @@ export default function Hero() {
       y: number,
       candle: CandleData,
       candleWidth: number,
-      scaleY: (value: number) => number
+      scaleY: (value: number) => number,
     ) => {
       const isUp = candle.close >= candle.open;
       const color = isUp ? colors.up : colors.down;
@@ -287,7 +308,12 @@ export default function Hero() {
       }
     };
 
-    const drawGrid = (ctx: CanvasRenderingContext2D, width: number, height: number, padding: number) => {
+    const drawGrid = (
+      ctx: CanvasRenderingContext2D,
+      width: number,
+      height: number,
+      padding: number,
+    ) => {
       ctx.strokeStyle = colors.grid;
       ctx.lineWidth = 1;
       const horizontalLines = 6;
@@ -325,7 +351,6 @@ export default function Hero() {
         if (candleDataRef.current.length > 0) {
           const liveCandle = generateLiveCandle();
           candleDataRef.current.push(liveCandle);
-
           if (candleDataRef.current.length > 200) {
             candleDataRef.current = candleDataRef.current.slice(-150);
           }
@@ -333,7 +358,10 @@ export default function Hero() {
         lastUpdateTime = currentTime;
       }
       const visibleData = candleDataRef.current.slice(-80);
-      const allPrices = visibleData.flatMap(candle => [candle.high, candle.low]);
+      const allPrices = visibleData.flatMap((candle) => [
+        candle.high,
+        candle.low,
+      ]);
       const maxPrice = Math.max(...allPrices);
       const minPrice = Math.min(...allPrices);
       const priceRange = maxPrice - minPrice || 1;
@@ -341,7 +369,10 @@ export default function Hero() {
         return ((maxPrice - price) / priceRange) * height;
       };
       const visibleCandles = 60;
-      const candleWidth = Math.max(2, (width - (visibleCandles - 1) * 2) / visibleCandles);
+      const candleWidth = Math.max(
+        2,
+        (width - (visibleCandles - 1) * 2) / visibleCandles,
+      );
       const spacing = 1;
       const totalWidth = visibleCandles * (candleWidth + spacing);
       const xStart = (width - totalWidth) / 2;
@@ -356,7 +387,8 @@ export default function Hero() {
       });
       if (displayData.length > 0) {
         const lastCandle = displayData[displayData.length - 1];
-        const lastX = xStart + (displayData.length - 1) * (candleWidth + spacing);
+        const lastX =
+          xStart + (displayData.length - 1) * (candleWidth + spacing);
         const lastY = scaleY(lastCandle.close);
         ctx.beginPath();
         ctx.moveTo(lastX + candleWidth, lastY);
@@ -375,15 +407,12 @@ export default function Hero() {
         }
       }
     };
-    let lastFrameTime = 0;
-    const animate = (timestamp: number) => {
-      const frameInterval = 33; // 33ms ≈ 30fps
-      if (timestamp - lastFrameTime >= frameInterval) {
-        draw();
-        lastFrameTime = timestamp;
-      }
+
+    const animate = () => {
+      draw();
       animationRef.current = requestAnimationFrame(animate);
     };
+
     const initCanvas = () => {
       canvas.width = canvas.clientWidth;
       canvas.height = canvas.clientHeight;
@@ -391,54 +420,57 @@ export default function Hero() {
       candleDataRef.current = initialData;
       candleDataRef.current.push(generateLiveCandle());
     };
+
     const handleResize = () => {
       canvas.width = canvas.clientWidth;
       canvas.height = canvas.clientHeight;
     };
+
     initCanvas();
     animationRef.current = requestAnimationFrame(animate);
-    window.addEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+
     return () => {
-      window.removeEventListener('resize', handleResize);
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
       }
+      window.removeEventListener("resize", handleResize);
     };
   }, [isDark]);
 
   const macWindowColors = {
     dark: {
-      bg: 'bg-gray-900',
-      headerBg: 'bg-gray-800',
-      headerBorder: 'border-gray-700',
-      tabBg: 'bg-gray-700',
-      tabActive: 'bg-gray-900 text-gray-100',
-      tabInactive: 'text-gray-400 hover:text-gray-200 hover:bg-gray-600/50',
-      codeBg: 'bg-gray-950',
-      codeBorder: 'border-gray-800',
-      textSecondary: 'text-gray-400',
-      copyBtn: 'text-gray-400 hover:text-gray-200',
-      copyBtnBg: 'hover:bg-gray-700',
-      copyBtnBorder: 'border-gray-600 hover:border-gray-500',
-      successBg: 'bg-green-500',
-      successText: 'text-gray-100',
+      bg: "bg-gray-900",
+      headerBg: "bg-gray-800",
+      headerBorder: "border-gray-700",
+      tabBg: "bg-gray-700",
+      tabActive: "bg-gray-900 text-gray-100",
+      tabInactive: "text-gray-400 hover:text-gray-200 hover:bg-gray-600/50",
+      codeBg: "bg-gray-950",
+      codeBorder: "border-gray-800",
+      textSecondary: "text-gray-400",
+      copyBtn: "text-gray-400 hover:text-gray-200",
+      copyBtnBg: "hover:bg-gray-700",
+      copyBtnBorder: "border-gray-600 hover:border-gray-500",
+      successBg: "bg-green-500",
+      successText: "text-gray-100",
     },
     light: {
-      bg: 'bg-gray-50',
-      headerBg: 'bg-gray-100',
-      headerBorder: 'border-gray-200',
-      tabBg: 'bg-gray-200',
-      tabActive: 'bg-white text-gray-800 shadow-sm',
-      tabInactive: 'text-gray-500 hover:text-gray-700 hover:bg-gray-300/50',
-      codeBg: 'bg-white',
-      codeBorder: 'border-gray-300',
-      textSecondary: 'text-gray-500',
-      copyBtn: 'text-gray-500 hover:text-gray-700',
-      copyBtnBg: 'hover:bg-gray-200',
-      copyBtnBorder: 'border-gray-300 hover:border-gray-400',
-      successBg: 'bg-green-400',
-      successText: 'text-white',
-    }
+      bg: "bg-gray-50",
+      headerBg: "bg-gray-100",
+      headerBorder: "border-gray-200",
+      tabBg: "bg-gray-200",
+      tabActive: "bg-white text-gray-800 shadow-sm",
+      tabInactive: "text-gray-500 hover:text-gray-700 hover:bg-gray-300/50",
+      codeBg: "bg-white",
+      codeBorder: "border-gray-300",
+      textSecondary: "text-gray-500",
+      copyBtn: "text-gray-500 hover:text-gray-700",
+      copyBtnBg: "hover:bg-gray-200",
+      copyBtnBorder: "border-gray-300 hover:border-gray-400",
+      successBg: "bg-green-400",
+      successText: "text-white",
+    },
   };
 
   const colors = isDark ? macWindowColors.dark : macWindowColors.light;
@@ -446,103 +478,95 @@ export default function Hero() {
   return (
     <section className="relative overflow-hidden pt-12 pb-0 sm:pt-16 lg:pt-20">
       <div className="absolute inset-0">
-        <canvas
-          ref={canvasRef}
-          className={hero.canvas.className}
-        />
+        <canvas ref={canvasRef} className={hero.canvas.className} />
         <div className={hero.gradientOverlay.className} />
       </div>
       <div className="container relative mx-auto px-4 sm:px-6 lg:px-8">
-        <div className={hero.container.className}>
-          <div className={hero.announcement.className}>
+        <div className="mx-auto max-w-3xl text-center">
+          {/* Announcement badge - 简约风格 */}
+          <div className="inline-flex items-center gap-1.5 rounded-full bg-muted/50 backdrop-blur-sm px-3 py-0.5 text-[10px] font-medium text-muted-foreground border border-border/50 mb-4">
             {hero.announcement.showDot && (
-              <div className={`w-2 h-2 rounded-full animate-pulse ${hero.announcement.dotColor}`} />
+              <div
+                className={`h-1.5 w-1.5 rounded-full animate-pulse ${hero.announcement.dotColor}`}
+              />
             )}
-            <span className="text-sm font-medium text-primary">
-              {localizedAnnouncementLabel}
-            </span>
+            <span>{localizedAnnouncementLabel}</span>
           </div>
-          <h1 className={hero.title.className}>
-            {renderHighlightedTitle(localizedTitleMain, localizedTitleHighlight)}
+
+          {/* Title - 保持原样 */}
+          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl text-foreground">
+            {renderHighlightedTitle(
+              localizedTitleMain,
+              localizedTitleHighlight,
+            )}
           </h1>
-          <p className={hero.description.className}>
+
+          {/* Description - 简约风格 */}
+          <p className="mt-3 text-sm text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             {localizedDescriptionText}
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className={`${hero.buttons.primary.className} cursor-pointer`}>
-              <Link href="/application" target="_blank" className="flex items-center gap-2">
-                <span className="relative z-10">
-                  {localizedPrimaryButtonLabel}
-                </span>
-              </Link>
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/60 to-primary/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            </button>
-            <button className={`${hero.buttons.market.className} cursor-pointer`}>
-              <Link href="/markets" target="_blank" className="flex items-center gap-2">
-                <span className="relative z-10">
-                  {localizedMarketButtonLabel}
-                </span>
-              </Link>
-              <div className="absolute inset-0 bg-gradient-to-r from-chart-2/60 to-chart-2/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            </button>
+
+          {/* Buttons - 简约风格 */}
+          <div className="mt-6 flex flex-col sm:flex-row gap-2.5 justify-center">
+            <Link
+              href="/application"
+              target="_blank"
+              className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+            >
+              {localizedPrimaryButtonLabel}
+            </Link>
+            <Link
+              href="/markets"
+              target="_blank"
+              className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors"
+            >
+              {localizedMarketButtonLabel}
+            </Link>
             <a
               href={hero.buttons.secondary.href}
               target="_blank"
               rel="noopener noreferrer"
-              className={`group relative px-8 py-3 rounded-lg overflow-hidden font-semibold transition-all duration-300 flex items-center gap-2.5 ${isDark
-                ? 'bg-gradient-to-r from-gray-800/80 to-gray-900/80 hover:from-gray-800 hover:to-gray-900 text-gray-100'
-                : 'bg-gradient-to-r from-gray-100/80 to-gray-200/80 hover:from-gray-100 hover:to-gray-200 text-gray-800'
-                }`}
+              className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium rounded-md bg-muted text-muted-foreground hover:bg-muted/80 transition-colors"
             >
-              <Github
-                className={`w-5 h-5 relative z-10 ${isDark ? 'text-gray-300' : 'text-gray-700'
-                  }`}
-              />
-              <span className="relative z-10 font-semibold">
-                {localizedSecondaryButtonLabel}
-              </span>
-              <div
-                className={`h-4 w-px relative z-10 ${isDark ? 'bg-gray-600' : 'bg-gray-400'
-                  }`}
-              />
-              <div className="flex items-center gap-1.5 relative z-10">
-                <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                <span className="font-semibold">
+              <Github className="h-4 w-4" />
+              <span>{localizedSecondaryButtonLabel}</span>
+              <div className="h-3 w-px bg-border" />
+              <div className="flex items-center gap-1">
+                <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" />
+                <span className="text-xs">
                   {githubStats.loading ? (
-                    <span
-                      className={`inline-block w-10 h-4 rounded animate-pulse ${isDark ? 'bg-gray-600' : 'bg-gray-300'
-                        }`}
-                    />
+                    <span className="inline-block w-8 h-3 bg-muted rounded animate-pulse" />
                   ) : (
                     githubStats.stars.toLocaleString()
                   )}
                 </span>
               </div>
-              <div
-                className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${isDark
-                  ? 'bg-gradient-to-r from-gray-700/40 to-gray-800/40'
-                  : 'bg-gradient-to-r from-gray-300/40 to-gray-400/40'
-                  }`}
-              />
             </a>
           </div>
-          <div className="mt-12 max-w-xl mx-auto">
-            <div className={`${colors.bg} rounded-lg overflow-hidden border ${colors.headerBorder} shadow-lg`}>
-              <div className={`flex items-center justify-between px-3 py-2 ${colors.headerBg} border-b ${colors.headerBorder}`}>
-                <div className="flex items-center gap-2">
+
+          {/* Installation Card - 保持原样 */}
+          <div className="mt-8 max-w-md mx-auto">
+            <div
+              className={`${colors.bg} rounded-lg overflow-hidden border ${colors.headerBorder} shadow-sm`}
+            >
+              <div
+                className={`flex items-center justify-between px-3 py-1.5 ${colors.headerBg} border-b ${colors.headerBorder}`}
+              >
+                <div className="flex items-center gap-1.5">
                   <div className="flex items-center gap-1">
-                    <div className="w-2.5 h-2.5 rounded-full bg-red-500 hover:bg-red-600 cursor-pointer transition-colors" />
-                    <div className="w-2.5 h-2.5 rounded-full bg-yellow-500 hover:bg-yellow-600 cursor-pointer transition-colors" />
-                    <div className="w-2.5 h-2.5 rounded-full bg-green-500 hover:bg-green-600 cursor-pointer transition-colors" />
+                    <div className="w-2 h-2 rounded-full bg-red-500" />
+                    <div className="w-2 h-2 rounded-full bg-yellow-500" />
+                    <div className="w-2 h-2 rounded-full bg-green-500" />
                   </div>
-                  <div className="ml-3 flex items-center ${colors.tabBg} rounded-md p-0.5">
-                    {(['npm', 'yarn', 'pnpm'] as const).map((tab) => (
+                  <div className="ml-2 flex items-center rounded-md p-0.5">
+                    {(["npm", "yarn", "pnpm"] as const).map((tab) => (
                       <button
                         key={tab}
-                        className={`px-2 py-1 text-xs font-medium rounded transition-all duration-200 ${activeTab === tab
-                          ? colors.tabActive
-                          : colors.tabInactive
-                          }`}
+                        className={`px-2 py-0.5 text-[10px] font-medium rounded transition-all duration-200 ${
+                          activeTab === tab
+                            ? colors.tabActive
+                            : colors.tabInactive
+                        }`}
                         onClick={() => setActiveTab(tab)}
                       >
                         {tab.toUpperCase()}
@@ -553,34 +577,56 @@ export default function Hero() {
                 <div className="relative">
                   <button
                     onClick={copyToClipboard}
-                    className={`text-xs ${colors.copyBtn} flex items-center gap-1 px-2 py-1 rounded transition-all duration-200 border ${colors.copyBtnBorder} ${colors.copyBtnBg} ${showCopySuccess ? 'opacity-0' : 'opacity-100'
-                      }`}
-                    style={{ transition: 'opacity 150ms ease-in-out' }}
+                    className={`text-[10px] ${colors.copyBtn} flex items-center gap-1 px-2 py-0.5 rounded transition-all duration-200 border ${colors.copyBtnBorder} ${colors.copyBtnBg} ${showCopySuccess ? "opacity-0" : "opacity-100"}`}
                   >
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    <svg
+                      className="h-2.5 w-2.5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                      />
                     </svg>
                     {currentCopyMessages.copy}
                   </button>
                   {showCopySuccess && (
                     <div
-                      className={`absolute top-0 left-0 right-0 bottom-0 flex items-center justify-center ${colors.successBg} ${colors.successText} text-xs font-medium rounded border ${colors.copyBtnBorder} transition-all duration-200 animate-in fade-in slide-in-from-top-1`}
+                      className={`absolute top-0 left-0 right-0 bottom-0 flex items-center justify-center ${colors.successBg} ${colors.successText} text-[10px] font-medium rounded border ${colors.copyBtnBorder} transition-all duration-200`}
                     >
-                      <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      <svg
+                        className="h-2.5 w-2.5 mr-0.5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M5 13l4 4L19 7"
+                        />
                       </svg>
                       {currentCopyMessages.copied}
                     </div>
                   )}
                 </div>
               </div>
-              <div className="p-4">
-                <div className={`${colors.codeBg} rounded border ${colors.codeBorder} overflow-hidden`}>
-                  <div className="p-3">
-                    <pre className="text-sm font-mono overflow-x-auto">
-                      <code className="block min-h-[20px]">
-                        <span className="text-green-500">$</span>{' '}
-                        <span className={isDark ? 'text-gray-100' : 'text-gray-800'}>
+              <div className="p-3">
+                <div
+                  className={`${colors.codeBg} rounded border ${colors.codeBorder} overflow-hidden`}
+                >
+                  <div className="p-2">
+                    <pre className="text-[11px] font-mono overflow-x-auto">
+                      <code className="block min-h-[16px]">
+                        <span className="text-green-500">$</span>{" "}
+                        <span
+                          className={isDark ? "text-gray-100" : "text-gray-800"}
+                        >
                           {installationCommands[activeTab]}
                         </span>
                       </code>
@@ -594,8 +640,13 @@ export default function Hero() {
       </div>
       <style jsx global>{`
         @keyframes gradient {
-          0%, 100% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
+          0%,
+          100% {
+            background-position: 0% 50%;
+          }
+          50% {
+            background-position: 100% 50%;
+          }
         }
         .animate-gradient {
           animation: gradient 3s ease-in-out infinite;
