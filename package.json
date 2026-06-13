@@ -9,7 +9,8 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@candleview/core": "^3.0.7",
+    "@candleview/core": "^3.1.0",
+    "@candleview/cvs-engine": "^0.1.2",
     "@heroicons/react": "^2.2.0",
     "candleview": "^2.9.2",
     "clsx": "^2.1.1",

@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { siteConfig } from "../config";
-import { useI18n } from "../providers/I18nProvider";
-import { TEST_CANDLEVIEW_DATA8 } from "../mock/mock_data_1";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { CandleView, TimeframeEnum } from "@candleview/core";
+import { siteConfig } from "../config";
+import { TEST_CANDLEVIEW_DATA8 } from "../mock/mock_data_1";
+import { useI18n } from "../providers/I18nProvider";
 
 interface LocalizableContent {
   en: string;
@@ -479,7 +479,7 @@ return {
   ];
 };
 
-export default function Preview() {
+export default function ScriptCompiler() {
   const { locale } = useI18n();
   const containerRef = useRef<HTMLDivElement>(null);
   const candleViewRef = useRef<CandleView | null>(null);
@@ -495,11 +495,31 @@ export default function Preview() {
   } | null>(null);
   const [isEngineRunning, setIsEngineRunning] = useState(false);
   const [logs, setLogs] = useState<string[]>([]);
+  const [leftWidth, setLeftWidth] = useState(60);
+  const [isLeftResizing, setIsLeftResizing] = useState(false);
+  const startXRef = useRef(0);
+  const startWidthRef = useRef(0);
+  const [editorTopHeight, setEditorTopHeight] = useState(60);
+  const [isEditorResizing, setIsEditorResizing] = useState(false);
+  const startEditorYRef = useRef(0);
+  const startEditorHeightRef = useRef(0);
+  const preview = siteConfig.preview;
+  const localizedTitleMain = getLocalizedContent(preview.title.main, locale);
+  const localizedTitleHighlight = getLocalizedContent(
+    preview.title.highlight,
+    locale,
+  );
+  const localizedSubtitleText = getLocalizedContent(
+    preview.subtitle.text,
+    locale,
+  );
 
+  // 拦截 console.log 来捕获脚本输出
   useEffect(() => {
     const originalLog = console.log;
     const originalWarn = console.warn;
     const originalError = console.error;
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     console.log = (...args: any[]) => {
       originalLog(...args);
@@ -531,6 +551,7 @@ export default function Preview() {
       const message = args.map((arg) => String(arg)).join(" ");
       setLogs((prev) => [...prev, `[ERROR] ${message}`]);
     };
+
     return () => {
       console.log = originalLog;
       console.warn = originalWarn;
@@ -555,6 +576,7 @@ export default function Preview() {
     });
     candleViewRef.current = candleView;
     setIsInitialized(true);
+
     import("@candleview/cvs-engine")
       .then((module) => {
         const { CVSEngine } = module;
@@ -565,12 +587,13 @@ export default function Preview() {
         });
         engineRef.current = engine;
         setIsEngineReady(true);
-        console.log("[Preview] CVSEngine loaded successfully");
+        console.log("[ScriptCompiler] CVSEngine loaded successfully");
       })
       .catch((err) => {
-        console.warn("[Preview] CVSEngine not available:", err.message);
+        console.warn("[ScriptCompiler] CVSEngine not available:", err.message);
         setIsEngineReady(false);
       });
+
     return () => {
       if (engineRef.current) {
         engineRef.current.stop();
@@ -585,6 +608,7 @@ export default function Preview() {
     };
   }, []);
 
+  // Handle theme changes
   useEffect(() => {
     const checkTheme = () => {
       const isDarkTheme = document.documentElement.classList.contains("dark");
@@ -642,7 +666,9 @@ export default function Preview() {
       });
       return;
     }
+
     setLogs([]);
+
     try {
       engineRef.current.loadScript(script);
       const result = engineRef.current.execute();
@@ -714,179 +740,314 @@ export default function Preview() {
     setExecutionResult({ success: true, message: "Example script loaded" });
   };
 
-  const preview = siteConfig.preview;
-  const localizedTitleMain = getLocalizedContent(preview.title.main, locale);
-  const localizedTitleHighlight = getLocalizedContent(
-    preview.title.highlight,
-    locale,
+  const startLeftResizing = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      startXRef.current = e.clientX;
+      startWidthRef.current = leftWidth;
+      setIsLeftResizing(true);
+    },
+    [leftWidth],
   );
-  const localizedSubtitleText = getLocalizedContent(
-    preview.subtitle.text,
-    locale,
+
+  const handleLeftMouseMove = useCallback(
+    (e: MouseEvent) => {
+      if (!isLeftResizing) return;
+      const windowWidth = window.innerWidth;
+      const deltaX = e.clientX - startXRef.current;
+      const deltaPercent = (deltaX / windowWidth) * 100;
+      let newWidth = startWidthRef.current + deltaPercent;
+      newWidth = Math.max(30, newWidth);
+      newWidth = Math.min(80, newWidth);
+      setLeftWidth(newWidth);
+    },
+    [isLeftResizing],
   );
+
+  const stopLeftResizing = useCallback(() => {
+    setIsLeftResizing(false);
+  }, []);
+
+  const startEditorResizing = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      startEditorYRef.current = e.clientY;
+      startEditorHeightRef.current = editorTopHeight;
+      setIsEditorResizing(true);
+    },
+    [editorTopHeight],
+  );
+
+  const handleEditorMouseMove = useCallback(
+    (e: MouseEvent) => {
+      if (!isEditorResizing) return;
+      const rightPanel = document.getElementById("right-panel");
+      if (!rightPanel) return;
+      const panelHeight = rightPanel.clientHeight;
+      const deltaY = e.clientY - startEditorYRef.current;
+      const deltaPercent = (deltaY / panelHeight) * 100;
+      let newHeight = startEditorHeightRef.current + deltaPercent;
+      newHeight = Math.max(30, newHeight);
+      newHeight = Math.min(80, newHeight);
+      setEditorTopHeight(newHeight);
+    },
+    [isEditorResizing],
+  );
+
+  const stopEditorResizing = useCallback(() => {
+    setIsEditorResizing(false);
+  }, []);
+
+  useEffect(() => {
+    if (isLeftResizing) {
+      document.addEventListener("mousemove", handleLeftMouseMove);
+      document.addEventListener("mouseup", stopLeftResizing);
+    } else {
+      document.removeEventListener("mousemove", handleLeftMouseMove);
+      document.removeEventListener("mouseup", stopLeftResizing);
+    }
+    return () => {
+      document.removeEventListener("mousemove", handleLeftMouseMove);
+      document.removeEventListener("mouseup", stopLeftResizing);
+    };
+  }, [isLeftResizing, handleLeftMouseMove, stopLeftResizing]);
+
+  useEffect(() => {
+    if (isEditorResizing) {
+      document.addEventListener("mousemove", handleEditorMouseMove);
+      document.addEventListener("mouseup", stopEditorResizing);
+    } else {
+      document.removeEventListener("mousemove", handleEditorMouseMove);
+      document.removeEventListener("mouseup", stopEditorResizing);
+    }
+    return () => {
+      document.removeEventListener("mousemove", handleEditorMouseMove);
+      document.removeEventListener("mouseup", stopEditorResizing);
+    };
+  }, [isEditorResizing, handleEditorMouseMove, stopEditorResizing]);
+
+  const getDividerHandleColor = () => {
+    return isDark
+      ? "bg-gray-600 group-hover:bg-blue-600"
+      : "bg-gray-400 group-hover:bg-blue-500";
+  };
+
   const exampleScripts = getExampleScripts(locale);
 
   return (
-    <section className="py-12">
-      <div
-        className="container mx-auto px-4 sm:px-6 lg:px-8"
-        style={{ width: "90%" }}
-      >
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl text-foreground">
-            {renderHighlightedTitle(
-              localizedTitleMain,
-              localizedTitleHighlight,
-            )}
-          </h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            {localizedSubtitleText}
-          </p>
-        </div>
-
-        {/* Chart - Top */}
-        <div className="mt-8 rounded-lg border border-border bg-muted/30 p-1">
+    <div className="fixed inset-0 overflow-hidden">
+      <div className="w-full h-full flex flex-col">
+        <div className="flex-1 flex overflow-hidden">
           <div
-            ref={containerRef}
-            className="w-full"
-            style={{ height: "500px" }}
-          />
-        </div>
-
-        {/* DSL Code Editor - Bottom */}
-        <div className="mt-6 rounded-lg border border-border bg-muted/30 overflow-hidden">
-          <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-muted/50">
-            <span className="text-sm font-medium text-foreground">
-              DSL Script Editor
-              {!isEngineReady && (
-                <span className="ml-2 text-xs text-yellow-500">
-                  (Engine loading...)
-                </span>
-              )}
-            </span>
-            <div className="flex gap-2">
-              <button
-                onClick={handleReset}
-                className="px-2 py-1 text-xs rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors"
-              >
-                Reset
-              </button>
-              <button
-                onClick={handleClear}
-                className="px-2 py-1 text-xs rounded-md bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors"
-              >
-                Clear All
-              </button>
+            className="relative overflow-hidden h-full"
+            style={{
+              width: `${leftWidth}%`,
+              minWidth: "30%",
+              maxWidth: "80%",
+            }}
+          >
+            <div ref={containerRef} className="w-full h-full" />
+          </div>
+          <div
+            className={`w-1 h-full cursor-col-resize relative group transition-colors duration-200 ${
+              isDark
+                ? "bg-gray-700 hover:bg-gray-600"
+                : "bg-gray-300 hover:bg-gray-400"
+            }`}
+            onMouseDown={startLeftResizing}
+          >
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div
+                className={`w-1 h-12 rounded transition-colors duration-200 ${getDividerHandleColor()}`}
+              />
             </div>
           </div>
-
-          {/* Quick Examples */}
-          <div className="px-4 py-2 border-b border-border bg-muted/30">
-            <div className="flex gap-2 flex-wrap">
-              <span className="text-xs text-muted-foreground mr-1">
-                {locale === "cn" ? "快速示例:" : "Quick Examples:"}
-              </span>
-              {exampleScripts.map((example, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => handleLoadExample(example.script)}
-                  className="px-2 py-0.5 text-xs rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors"
-                >
-                  {example.name}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Script Input */}
-          <textarea
-            value={script}
-            onChange={(e) => setScript(e.target.value)}
-            className="w-full h-[250px] p-4 font-mono text-sm bg-background text-foreground resize-none focus:outline-none"
-            spellCheck={false}
-            style={{ fontFamily: 'Menlo, Monaco, "Courier New", monospace' }}
-          />
-
-          {/* Output Area - Console Logs */}
-          <div className="border-t border-border">
-            <div className="flex items-center justify-between px-4 py-2 bg-muted/30">
-              <span className="text-xs font-medium text-foreground">
-                📋 {locale === "cn" ? "输出日志" : "Output Logs"}
-              </span>
-              <button
-                onClick={handleClearLogs}
-                className="px-2 py-0.5 text-xs rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors"
-              >
-                {locale === "cn" ? "清空" : "Clear"}
-              </button>
-            </div>
-            <div className="h-[120px] overflow-auto p-3 font-mono text-xs bg-background/50 scrollbar-custom">
-              {logs.length === 0 ? (
-                <span className="text-muted-foreground">
-                  {locale === "cn"
-                    ? "等待脚本执行..."
-                    : "Waiting for script execution..."}
+          <div
+            id="right-panel"
+            className="flex-1 overflow-hidden"
+            style={{ width: `${100 - leftWidth}%` }}
+          >
+            <div className="w-full h-full rounded-none border border-border bg-muted/30 overflow-hidden flex flex-col">
+              <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-muted/50 flex-shrink-0">
+                <span className="text-sm font-medium text-foreground">
+                  DSL Script Editor
+                  {!isEngineReady && (
+                    <span className="ml-2 text-xs text-yellow-500">
+                      (Engine loading...)
+                    </span>
+                  )}
                 </span>
-              ) : (
-                logs.map((log, idx) => (
-                  <div
-                    key={idx}
-                    className="py-0.5 text-foreground/80 border-b border-border/50"
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleReset}
+                    className="px-2 py-1 text-xs rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors"
                   >
-                    {log}
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
+                    Reset
+                  </button>
+                  <button
+                    onClick={handleClear}
+                    className="px-2 py-1 text-xs rounded-md bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors"
+                  >
+                    Clear All
+                  </button>
+                </div>
+              </div>
 
-          {/* Action Buttons */}
-          <div className="flex items-center justify-between px-4 py-2 border-t border-border bg-muted/50">
-            <div className="flex gap-2">
-              <button
-                onClick={handleExecute}
-                disabled={!isEngineReady}
-                className={`px-3 py-1 text-sm rounded-md transition-colors ${
-                  isEngineReady
-                    ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                    : "bg-muted text-muted-foreground cursor-not-allowed"
-                }`}
+              <div className="px-4 py-2 border-b border-border bg-muted/30 flex-shrink-0">
+                <div className="flex gap-2 flex-wrap">
+                  <span className="text-xs text-muted-foreground mr-1">
+                    {locale === "cn" ? "快速示例:" : "Quick Examples:"}
+                  </span>
+                  {exampleScripts.map((example, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => handleLoadExample(example.script)}
+                      className="px-2 py-0.5 text-xs rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors"
+                    >
+                      {example.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div
+                className="flex-1 flex flex-col overflow-hidden"
+                style={{ minHeight: "200px" }}
               >
-                Execute
-              </button>
-              <button
-                onClick={handleStart}
-                disabled={!isEngineReady || isEngineRunning}
-                className={`px-3 py-1 text-sm rounded-md transition-colors ${
-                  !isEngineReady || isEngineRunning
-                    ? "bg-muted text-muted-foreground cursor-not-allowed"
-                    : "bg-green-600 text-white hover:bg-green-700"
-                }`}
-              >
-                Start
-              </button>
-              <button
-                onClick={handleStop}
-                disabled={!isEngineReady || !isEngineRunning}
-                className={`px-3 py-1 text-sm rounded-md transition-colors ${
-                  !isEngineReady || !isEngineRunning
-                    ? "bg-muted text-muted-foreground cursor-not-allowed"
-                    : "bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                }`}
-              >
-                Stop
-              </button>
+                <div
+                  className="overflow-hidden flex flex-col"
+                  style={{
+                    height: `${editorTopHeight}%`,
+                    minHeight: "30%",
+                    maxHeight: "80%",
+                  }}
+                >
+                  <div className="flex items-center px-4 py-1 bg-muted/20 border-b border-border">
+                    <span className="text-xs font-medium text-foreground">
+                      📝 {locale === "cn" ? "脚本编辑区" : "Script Editor"}
+                    </span>
+                  </div>
+                  <textarea
+                    value={script}
+                    onChange={(e) => setScript(e.target.value)}
+                    className="w-full flex-1 p-4 font-mono text-sm bg-background text-foreground resize-none focus:outline-none scrollbar-custom"
+                    spellCheck={false}
+                    style={{
+                      fontFamily: 'Menlo, Monaco, "Courier New", monospace',
+                    }}
+                  />
+                </div>
+
+                <div
+                  className={`w-full h-1 cursor-row-resize relative group transition-colors duration-200 ${
+                    isDark
+                      ? "bg-gray-700 hover:bg-gray-600"
+                      : "bg-gray-300 hover:bg-gray-400"
+                  }`}
+                  onMouseDown={startEditorResizing}
+                >
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div
+                      className={`h-1 w-12 rounded transition-colors duration-200 ${getDividerHandleColor()}`}
+                    />
+                  </div>
+                </div>
+
+                <div
+                  className="overflow-hidden flex flex-col"
+                  style={{
+                    height: `${100 - editorTopHeight}%`,
+                    minHeight: "20%",
+                  }}
+                >
+                  <div className="flex items-center justify-between px-4 py-1 bg-muted/20 border-b border-border">
+                    <span className="text-xs font-medium text-foreground">
+                      📋 {locale === "cn" ? "输出日志" : "Output Logs"}
+                    </span>
+                    <button
+                      onClick={handleClearLogs}
+                      className="px-2 py-0.5 text-xs rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors"
+                    >
+                      {locale === "cn" ? "清空" : "Clear"}
+                    </button>
+                  </div>
+                  <div className="flex-1 overflow-auto p-3 font-mono text-xs bg-background/50 scrollbar-custom">
+                    {logs.length === 0 ? (
+                      <span className="text-muted-foreground">
+                        {locale === "cn"
+                          ? "等待脚本执行..."
+                          : "Waiting for script execution..."}
+                      </span>
+                    ) : (
+                      logs.map((log, idx) => (
+                        <div
+                          key={idx}
+                          className="py-0.5 text-foreground/80 border-b border-border/50"
+                        >
+                          {log}
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between px-4 py-2 border-t border-border bg-muted/50 flex-shrink-0">
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleExecute}
+                    disabled={!isEngineReady}
+                    className={`px-3 py-1 text-sm rounded-md transition-colors ${
+                      isEngineReady
+                        ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                        : "bg-muted text-muted-foreground cursor-not-allowed"
+                    }`}
+                  >
+                    Execute
+                  </button>
+                  <button
+                    onClick={handleStart}
+                    disabled={!isEngineReady || isEngineRunning}
+                    className={`px-3 py-1 text-sm rounded-md transition-colors ${
+                      !isEngineReady || isEngineRunning
+                        ? "bg-muted text-muted-foreground cursor-not-allowed"
+                        : "bg-green-600 text-white hover:bg-green-700"
+                    }`}
+                  >
+                    Start
+                  </button>
+                  <button
+                    onClick={handleStop}
+                    disabled={!isEngineReady || !isEngineRunning}
+                    className={`px-3 py-1 text-sm rounded-md transition-colors ${
+                      !isEngineReady || !isEngineRunning
+                        ? "bg-muted text-muted-foreground cursor-not-allowed"
+                        : "bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    }`}
+                  >
+                    Stop
+                  </button>
+                </div>
+                {executionResult && (
+                  <span
+                    className={`text-xs ${executionResult.success ? "text-green-600" : "text-red-500"}`}
+                  >
+                    {executionResult.message}
+                  </span>
+                )}
+              </div>
             </div>
-            {executionResult && (
-              <span
-                className={`text-xs ${executionResult.success ? "text-green-600" : "text-red-500"}`}
-              >
-                {executionResult.message}
-              </span>
-            )}
           </div>
         </div>
       </div>
+
+      {isLeftResizing && (
+        <div className="fixed inset-0 z-50 cursor-col-resize"></div>
+      )}
+      {isEditorResizing && (
+        <div className="fixed inset-0 z-50 cursor-row-resize"></div>
+      )}
+
       <style jsx global>{`
         @keyframes gradient {
           0%,
@@ -901,82 +1062,94 @@ export default function Preview() {
           animation: gradient 3s ease-in-out infinite;
         }
 
-        textarea,
-        .overflow-auto,
+        /* 自定义滚动条 - 跟随主题 */
         .scrollbar-custom {
           scrollbar-width: thin;
+          scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
         }
 
-        textarea::-webkit-scrollbar,
-        .overflow-auto::-webkit-scrollbar,
         .scrollbar-custom::-webkit-scrollbar {
           width: 6px;
           height: 6px;
         }
 
-        textarea::-webkit-scrollbar-track,
-        .overflow-auto::-webkit-scrollbar-track,
         .scrollbar-custom::-webkit-scrollbar-track {
           background: transparent;
           border-radius: 3px;
         }
 
-        textarea::-webkit-scrollbar-thumb,
-        .overflow-auto::-webkit-scrollbar-thumb,
         .scrollbar-custom::-webkit-scrollbar-thumb {
+          background: rgba(156, 163, 175, 0.5);
+          border-radius: 3px;
+          transition: background 0.2s ease;
+        }
+
+        .scrollbar-custom::-webkit-scrollbar-thumb:hover {
+          background: rgba(156, 163, 175, 0.7);
+        }
+
+        .scrollbar-custom::-webkit-scrollbar-corner {
+          background: transparent;
+        }
+
+        /* 深色主题滚动条 */
+        .dark .scrollbar-custom {
+          scrollbar-color: rgba(75, 85, 99, 0.6) transparent;
+        }
+
+        .dark .scrollbar-custom::-webkit-scrollbar-thumb {
+          background: rgba(75, 85, 99, 0.6);
+        }
+
+        .dark .scrollbar-custom::-webkit-scrollbar-thumb:hover {
+          background: rgba(75, 85, 99, 0.8);
+        }
+
+        /* 为所有需要自定义滚动条的元素添加样式 */
+        textarea,
+        .overflow-auto {
+          scrollbar-width: thin;
+        }
+
+        textarea::-webkit-scrollbar,
+        .overflow-auto::-webkit-scrollbar {
+          width: 6px;
+          height: 6px;
+        }
+
+        textarea::-webkit-scrollbar-track,
+        .overflow-auto::-webkit-scrollbar-track {
+          background: transparent;
+          border-radius: 3px;
+        }
+
+        textarea::-webkit-scrollbar-thumb,
+        .overflow-auto::-webkit-scrollbar-thumb {
           background: rgba(156, 163, 175, 0.4);
           border-radius: 3px;
           transition: background 0.2s ease;
         }
 
         textarea::-webkit-scrollbar-thumb:hover,
-        .overflow-auto::-webkit-scrollbar-thumb:hover,
-        .scrollbar-custom::-webkit-scrollbar-thumb:hover {
+        .overflow-auto::-webkit-scrollbar-thumb:hover {
           background: rgba(156, 163, 175, 0.6);
         }
 
-        textarea::-webkit-scrollbar-corner,
-        .overflow-auto::-webkit-scrollbar-corner,
-        .scrollbar-custom::-webkit-scrollbar-corner {
-          background: transparent;
-        }
-
-        .dark textarea::-webkit-scrollbar-track,
-        .dark .overflow-auto::-webkit-scrollbar-track,
-        .dark .scrollbar-custom::-webkit-scrollbar-track {
-          background: rgba(30, 30, 35, 0.8);
-        }
-
         .dark textarea::-webkit-scrollbar-thumb,
-        .dark .overflow-auto::-webkit-scrollbar-thumb,
-        .dark .scrollbar-custom::-webkit-scrollbar-thumb {
-          background: rgba(75, 85, 99, 0.6);
+        .dark .overflow-auto::-webkit-scrollbar-thumb {
+          background: rgba(75, 85, 99, 0.5);
         }
 
         .dark textarea::-webkit-scrollbar-thumb:hover,
-        .dark .overflow-auto::-webkit-scrollbar-thumb:hover,
-        .dark .scrollbar-custom::-webkit-scrollbar-thumb:hover {
-          background: rgba(75, 85, 99, 0.8);
+        .dark .overflow-auto::-webkit-scrollbar-thumb:hover {
+          background: rgba(75, 85, 99, 0.7);
         }
 
-        .dark textarea::-webkit-scrollbar-corner,
-        .dark .overflow-auto::-webkit-scrollbar-corner,
-        .dark .scrollbar-custom::-webkit-scrollbar-corner {
+        textarea::-webkit-scrollbar-corner,
+        .overflow-auto::-webkit-scrollbar-corner {
           background: transparent;
         }
-
-        .dark textarea,
-        .dark .overflow-auto,
-        .dark .scrollbar-custom {
-          scrollbar-color: rgba(75, 85, 99, 0.6) rgba(30, 30, 35, 0.8);
-        }
-
-        textarea,
-        .overflow-auto,
-        .scrollbar-custom {
-          scrollbar-color: rgba(156, 163, 175, 0.4) transparent;
-        }
       `}</style>
-    </section>
+    </div>
   );
 }

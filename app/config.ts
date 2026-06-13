@@ -1,19 +1,18 @@
-// config.ts
 export const siteConfig = {
   name: '{siteName}',
   email: 'superhappyboy1995@gmail.com',
   metadata: {
     title: {
-      en: '🕯️CandleView | Professional time series data visualization and charting engine',
-      cn: '🕯️烛光视图 | 专业的时间序列数据可视化与图表绘制引擎'
+      en: '🕯️CandleView | A programmable time-series data visualization and charting engine designed specifically for the financial industry.',
+      cn: '🕯️CandleView | 专为金融行业设计的可编程时间序列数据可视化和图表引擎.'
     },
     description: {
-      en: 'A high-performance data visualization charting engine for the financial industry, designed for time series data analysis.',
-      cn: '一款专为金融行业打造的高性能数据可视化图表引擎，专注于时间序列数据分析'
+      en: 'A programmable, high-performance visualization engine for financial time-series data. Build custom indicators, analyze massive datasets, and create dynamic dashboards with our built-in DSL.',
+      cn: '一个专为金融时间序列数据打造的可编程、高性能可视化引擎。使用内置DSL构建自定义指标、分析海量数据集、创建动态看板。'
     },
     keywords: {
-      en: 'time series, financial charts, data visualization, candlestick, technical analysis, WebGL',
-      cn: '时间序列, 金融图表, 数据可视化, K线图, 技术分析, WebGL'
+      en: 'programmable charts, time-series database, financial visualization, custom indicators, DSL, candlestick chart, WebGL, quantitative analysis',
+      cn: '可编程图表, 时间序列数据库, 金融可视化, 自定义指标, DSL, K线图, WebGL, 量化分析'
     }
   },
   logo: {
@@ -60,19 +59,19 @@ export const siteConfig = {
     },
     title: {
       main: {
-        en: 'Professional Time Series Data Visualization',
-        cn: '专业的时间序列数据可视化'
+        en: 'Build Programmable Time-Series Visualizations',
+        cn: '构建可编程的时间序列可视化应用'
       },
       highlight: {
-        en: 'Time Series',
-        cn: '时间序列'
+        en: 'Programmable',
+        cn: '可编程'
       },
       className: 'text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 tracking-tight'
     },
     description: {
       text: {
-        en: 'A high-performance, real-time data visualization platform designed specifically for financial time series data and technical analysis.',
-        cn: '一个专为金融时间序列数据和技术分析打造的高性能实时数据可视化平台'
+        en: 'The only engine that combines high-performance charting with a powerful, built-in DSL. Script custom indicators, automate analysis, and bring your financial data to life.',
+        cn: '唯一一个将高性能图表与强大内置DSL相结合的引擎。编写脚本自定义指标、自动化分析，让您的金融数据栩栩如生。'
       },
       className: 'text-xl text-muted-foreground max-w-3xl mx-auto mb-6 leading-relaxed'
     },
@@ -91,9 +90,16 @@ export const siteConfig = {
         },
         className: 'group relative px-8 py-3 rounded-lg overflow-hidden bg-gradient-to-r from-emerald-600 to-emerald-500 text-white font-semibold transition-all duration-300 hover:from-emerald-500 hover:to-emerald-400 shadow-lg hover:shadow-emerald-500/20'
       },
+      script: {
+        label: {
+          en: 'DSL Script',
+          cn: 'DSL脚本'
+        },
+        className: 'group relative px-8 py-3 rounded-lg overflow-hidden bg-gradient-to-r from-purple-600 to-purple-500 text-white font-semibold transition-all duration-300 hover:from-purple-500 hover:to-purple-400 shadow-lg hover:shadow-purple-500/20'
+      },
       secondary: {
         label: {
-          en: 'GitHub Start',
+          en: 'GitHub Star',
           cn: 'GitHub 星标'
         },
         href: 'https://github.com/0xhappyboy/candleview',
@@ -167,8 +173,8 @@ export const siteConfig = {
         imageUrl: 'https://raw.githubusercontent.com/0xhappyboy/candleview/main/assets/logo/logo_50x50.jpeg',
       },
       description: {
-        en: 'A professional time series data visualization and charting engine for the financial industry.',
-        cn: '一款专为金融行业打造的专业时间序列数据可视化与图表绘制引擎'
+        en: 'The programmable engine for financial time-series data visualization and analysis.',
+        cn: '专为金融时间序列数据可视化与分析打造的可编程引擎。'
       }
     },
     navSections: [

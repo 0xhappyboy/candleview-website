@@ -24,26 +24,26 @@
   },
   "Hero": {
     "announcement": "版本 3.0 已发布",
-    "title": "专为<highlight>时间序列数据</highlight>打造的专业图表引擎",
-    "description": "为金融行业量身定制的高性能时间序列可视化引擎，支持百万级数据点流畅渲染，毫秒级响应，为您的数据分析决策提供强有力的可视化支持。",
-    "ctaPrimary": "快速开始",
+    "title": "专为金融<highlight>时间序列</highlight>打造的<highlight>可编程</highlight>图表引擎",
+    "description": "体验业界首个真正的可编程时间序列可视化引擎。专为金融行业设计，让您编写自定义指标、分析海量数据、构建动态交易逻辑——一切都在一个高性能图表环境中完成。",
+    "ctaPrimary": "开始构建",
     "ctaSecondary": "查看演示"
   },
   "Features": {
-    "title": "为什么选择 CandleView",
-    "subtitle": "专为金融时间序列可视化场景设计，提供专业的数据分析体验",
-    "plugAndPlay": "开箱即用",
-    "plugAndPlayDesc": "简单快速集成，零成本上手，显示一个专业的时间序列图表仅需数行代码，让使用者专注于数据对接与分析。",
-    "dataDriven": "数据驱动",
-    "dataDrivenDesc": "灵活的数据结构支持，实时数据更新，历史与实时数据平滑过渡，提供无缝的时间序列可视化体验。",
-    "lowMemory": "低内存占用",
-    "lowMemoryDesc": "创新的数据压缩算法，内存占用降低70%，支持大规模时间序列数据实时处理。",
+    "title": "为可编程时间序列分析而设计",
+    "subtitle": "超越静态图表。将逻辑、数据和可视化集成到一个强大的工作流中。",
+    "plugAndPlay": "DSL驱动 & 可编程",
+    "plugAndPlayDesc": "释放内置DSL的全部能力。编写脚本来计算自定义指标、叠加复杂的技术信号、根据条件绘制图形和文字，让您完全掌控分析过程。",
+    "dataDriven": "时间序列原生优化",
+    "dataDrivenDesc": "原生支持tick、秒、分钟和日线数据。引擎能够无缝精准地处理实时流数据、历史数据回填和数据空缺。",
+    "lowMemory": "海量数据，极低占用",
+    "lowMemoryDesc": "先进的数据降采样和序列化技术，内存占用降低高达70%，轻松实现百万级历史数据点的流畅交互。",
     "professionalCharts": "专业金融图表",
-    "professionalChartsDesc": "内置K线图、分时图、热力图等专业时间序列图表类型，支持自定义扩展和多种技术指标。",
-    "multiPlatform": "多端适配",
-    "multiPlatformDesc": "响应式设计，针对移动端做了单独适配，完美适配桌面、移动端及触摸屏终端。",
-    "highExtensibility": "高可扩展性",
-    "highExtensibilityDesc": "提供丰富的API、样式配置、技术指标、画线模型和坐标轴扩展，满足各类时间序列数据可视化需求。"
+    "professionalChartsDesc": "包含K线图、OHLC图、平均K线图等全套图表类型。完美适配股票、外汇、加密货币等各类金融品种。",
+    "multiPlatform": "跨平台 & 响应式",
+    "multiPlatformDesc": "完全响应式设计，确保从桌面工作站到移动设备的完美体验。为移动端分析优化的触控交互。",
+    "highExtensibility": "无限扩展能力",
+    "highExtensibilityDesc": "扩展引擎的每一层。使用全面的公共API创建自定义绘图工具、集成专有指标、设计独特的视觉主题。"
   },
   "Benchmark": {
     "title": "性能基准测试",
@@ -244,18 +244,18 @@
     "highCustomizationDesc": "支持自定义指标公式、绘图工具样式、快捷键配置，满足个性化需求"
   },
   "CTASection": {
-    "title": "立即体验专业时间序列图表",
-    "subtitle": "加入全球超过 5000+ 金融机构的选择，开始构建您的下一代数据分析系统",
+    "title": "准备构建可编程的时间序列应用？",
+    "subtitle": "加入重新定义数据可视化的开发者和金融工程师社区，与CandleView同行。",
     "feature1": "30天免费试用",
     "feature2": "无需信用卡",
-    "feature3": "优先技术支持",
-    "feature4": "定制化集成",
+    "feature3": "完整DSL权限",
+    "feature4": "优先技术支持",
     "ctaPrimary": "开始免费试用",
-    "ctaSecondary": "联系销售",
-    "enterpriseUsers": "企业用户",
-    "availability": "服务可用性",
+    "ctaSecondary": "联系技术团队",
+    "enterpriseUsers": "量化团队信赖之选",
+    "availability": "99.9% 服务可用性",
     "support": "技术支持",
-    "integrations": "交易所集成"
+    "integrations": "交易所对接"
   },
   "Footer": {
     "product": "产品",
@@ -278,7 +278,7 @@
     "terms": "服务条款",
     "security": "安全报告",
     "cookies": "Cookie政策",
-    "description": "专为金融科技打造的下一代高性能时间序列图表引擎。支持 WebGL、Canvas、SVG、实时数据流、高频数据处理。",
+    "description": "首个为金融时间序列数据打造的可编程、高性能图表引擎。为开发者而生，由开发者打造。",
     "rightsReserved": "保留所有权利。",
     "status": "所有系统运行正常"
   }

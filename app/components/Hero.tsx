@@ -111,6 +111,12 @@ export default function Hero() {
     hero.buttons.market.label,
     locale,
   );
+
+  const localizedScriptButtonLabel = getLocalizedContent(
+    hero.buttons?.script?.label || { en: "DSL Script", cn: "SDL脚本" },
+    locale,
+  );
+
   const installationCommands = {
     npm: "npm i @candleview/core",
     yarn: "yarn add @candleview/core",
@@ -167,7 +173,7 @@ export default function Hero() {
       } else {
         setGithubStats((prev) => ({ ...prev, loading: false, error: true }));
       }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       setGithubStats((prev) => ({ ...prev, loading: false, error: true }));
     }
@@ -483,7 +489,6 @@ export default function Hero() {
       </div>
       <div className="container relative mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-3xl text-center">
-          {/* Announcement badge - 简约风格 */}
           <div className="inline-flex items-center gap-1.5 rounded-full bg-muted/50 backdrop-blur-sm px-3 py-0.5 text-[10px] font-medium text-muted-foreground border border-border/50 mb-4">
             {hero.announcement.showDot && (
               <div
@@ -493,7 +498,6 @@ export default function Hero() {
             <span>{localizedAnnouncementLabel}</span>
           </div>
 
-          {/* Title - 保持原样 */}
           <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl text-foreground">
             {renderHighlightedTitle(
               localizedTitleMain,
@@ -501,12 +505,10 @@ export default function Hero() {
             )}
           </h1>
 
-          {/* Description - 简约风格 */}
           <p className="mt-3 text-sm text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             {localizedDescriptionText}
           </p>
 
-          {/* Buttons - 简约风格 */}
           <div className="mt-6 flex flex-col sm:flex-row gap-2.5 justify-center">
             <Link
               href="/application"
@@ -521,6 +523,13 @@ export default function Hero() {
               className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors"
             >
               {localizedMarketButtonLabel}
+            </Link>
+            <Link
+              href="/scripteditor"
+              target="_blank"
+              className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors"
+            >
+              {localizedScriptButtonLabel}
             </Link>
             <a
               href={hero.buttons.secondary.href}
@@ -544,7 +553,6 @@ export default function Hero() {
             </a>
           </div>
 
-          {/* Installation Card - 保持原样 */}
           <div className="mt-8 max-w-md mx-auto">
             <div
               className={`${colors.bg} rounded-lg overflow-hidden border ${colors.headerBorder} shadow-sm`}

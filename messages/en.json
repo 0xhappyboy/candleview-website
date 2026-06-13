@@ -24,26 +24,26 @@
   },
   "Hero": {
     "announcement": "Version 3.0 Released",
-    "title": "Professional Charting Engine for <highlight>Time Series Data</highlight>",
-    "description": "Built for the financial industry, our high-performance time series visualization engine supports millions of data points with smooth rendering and millisecond response times.",
-    "ctaPrimary": "Quick Start",
-    "ctaSecondary": "View Demo"
+    "title": "The <highlight>Programmable</highlight> Charting Engine for Financial <highlight>Time Series</highlight>",
+    "description": "Experience the industry's first truly programmable time-series visualization engine. Built specifically for the financial sector, it empowers you to write custom indicators, analyze massive datasets, and build dynamic trading logic—all within a high-performance charting environment.",
+    "ctaPrimary": "Start Building",
+    "ctaSecondary": "See Live Demo"
   },
   "Features": {
-    "title": "Why Choose CandleView",
-    "subtitle": "Designed for professional time series data visualization",
-    "plugAndPlay": "Plug and Play",
-    "plugAndPlayDesc": "Simple and quick integration, zero cost to get started, displaying a professional time series chart requires just a few lines of code.",
-    "dataDriven": "Data Driven",
-    "dataDrivenDesc": "Flexible data structure support, real-time data updates, smooth transitions between historical and real-time data for seamless visualization.",
-    "lowMemory": "Low Memory Footprint",
-    "lowMemoryDesc": "Innovative data compression algorithms reduce memory usage by 70%, supporting large-scale real-time data processing.",
+    "title": "Engineered for Programmable Time-Series Analysis",
+    "subtitle": "Move beyond static charts. Integrate logic, data, and visualization into a single, powerful workflow.",
+    "plugAndPlay": "DSL-Driven & Programmable",
+    "plugAndPlayDesc": "Unleash the full power of our built-in DSL. Write scripts to compute custom metrics, overlay complex indicators, and conditionally draw shapes or text, giving you complete control over your analysis.",
+    "dataDriven": "Time-Series Optimized",
+    "dataDrivenDesc": "Native support for tick, second, minute, and daily data. Our engine handles real-time streaming, historical backfills, and data gaps with seamless precision for any time-series dataset.",
+    "lowMemory": "Massive Data, Minimal Footprint",
+    "lowMemoryDesc": "Advanced downsampling and data serialization techniques reduce memory usage by up to 70%, enabling smooth interaction with millions of historical data points.",
     "professionalCharts": "Professional Financial Charts",
-    "professionalChartsDesc": "Built-in candlestick charts, time-sharing charts, heat maps and other professional chart types for time series analysis.",
-    "multiPlatform": "Multi-Platform Support",
-    "multiPlatformDesc": "Responsive design with dedicated mobile adaptation, perfectly adapting to desktop, mobile, and touch-screen terminals.",
-    "highExtensibility": "High Extensibility",
-    "highExtensibilityDesc": "Rich APIs, style configurations, technical indicators, drawing tools, and coordinate axis extensions for unlimited customization."
+    "professionalChartsDesc": "A complete suite of chart types including Candlestick, OHLC, and Heikin-Ashi. Perfect for equities, forex, crypto, and any financial instrument.",
+    "multiPlatform": "Cross-Platform & Responsive",
+    "multiPlatformDesc": "Fully responsive design ensures a flawless experience from desktop workstations to mobile devices. Touch-optimized controls for on-the-go analysis.",
+    "highExtensibility": "Infinite Extensibility",
+    "highExtensibilityDesc": "Extend every layer of the engine. Create custom drawing tools, integrate proprietary indicators, and design unique visual themes using our comprehensive public API."
   },
   "Benchmark": {
     "title": "Benchmark Tests",
@@ -244,16 +244,16 @@
     "highCustomizationDesc": "Support custom indicator formulas, drawing tool styles, and shortcut configurations to meet personalized needs."
   },
   "CTASection": {
-    "title": "Experience Professional Time Series Charts Now",
-    "subtitle": "Join over 5,000+ financial institutions worldwide and start building your next-generation data analysis system",
+    "title": "Ready to build programmable time-series applications?",
+    "subtitle": "Join the community of developers and financial engineers who are redefining data visualization with CandleView.",
     "feature1": "30-day free trial",
     "feature2": "No credit card required",
-    "feature3": "Priority support",
-    "feature4": "Custom integrations",
+    "feature3": "Full DSL access",
+    "feature4": "Priority engineering support",
     "ctaPrimary": "Start Free Trial",
-    "ctaSecondary": "Contact Sales",
-    "enterpriseUsers": "Enterprise Users",
-    "availability": "Service Availability",
+    "ctaSecondary": "Contact Engineering",
+    "enterpriseUsers": "Trusted by Quants",
+    "availability": "99.9% Uptime SLA",
     "support": "Technical Support",
     "integrations": "Exchange Integrations"
   },
@@ -278,7 +278,7 @@
     "terms": "Terms of Service",
     "security": "Security Report",
     "cookies": "Cookies",
-    "description": "Next-generation high-performance time series charting engine built for fintech. Supporting WebGL, Canvas, SVG, real-time data streaming, and high-frequency data processing.",
+    "description": "The first programmable, high-performance charting engine for financial time-series data. Built for developers, by developers.",
     "rightsReserved": "All rights reserved.",
     "status": "All systems operational"
   }
