@@ -5,7 +5,7 @@ import { TEST_CANDLEVIEW_DATA8 } from "../mock/mock_data_1";
 import { useI18n } from "../providers/I18nProvider";
 import Cryptos from "./Cryptos";
 import Stocks from "./Stocks";
-import { CandleView, ICandleViewDataPoint } from "@candleview/core";
+import { CandleView, ICandleViewDataPoint, TimeframeEnum } from "@candleview/core";
 
 interface YahooFinanceChartResult {
   meta: {
@@ -873,6 +873,7 @@ export default function FullViewportComponent() {
       try {
         const data = JSON.parse(event.data);
         if (data.e === "24hrTicker") {
+          // eslint-disable-next-line react-hooks/immutability
           updateCryptoPrice(data);
         }
       } catch (err) {}
@@ -887,6 +888,7 @@ export default function FullViewportComponent() {
         clearTimeout(reconnectTimeoutRef.current);
       }
       reconnectTimeoutRef.current = setTimeout(() => {
+        // eslint-disable-next-line react-hooks/immutability
         initializeWebSocket();
       }, 5000);
     };
@@ -1093,7 +1095,8 @@ export default function FullViewportComponent() {
       const { limit, totalCandles } =
         TIMEFRAME_CONFIGS[timeframe] || TIMEFRAME_CONFIGS["1m"];
       let allData: ICandleViewDataPoint[] = [];
-      let endTime = Date.now();
+      // eslint-disable-next-line react-hooks/purity
+      const endTime = Date.now();
       let startTime: number;
       const timeIntervalMs = getTimeIntervalInMs(timeframe);
       if (
@@ -1240,6 +1243,7 @@ export default function FullViewportComponent() {
 
   useEffect(() => {
     initializeWebSocket();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchStockData();
     const stockInterval = setInterval(() => {
       if (!isLoadingStocks && !isRefreshingStocks) {
@@ -1255,11 +1259,12 @@ export default function FullViewportComponent() {
       }
       clearInterval(stockInterval);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initializeWebSocket]);
 
   useEffect(() => {
     if (!stockSearchTerm.trim()) {
-      let sorted = [...stockList];
+      const sorted = [...stockList];
       if (stockSortBy === "volume") {
         sorted.sort((a, b) => b.volume - a.volume);
       } else if (stockSortBy === "change") {
@@ -1269,6 +1274,7 @@ export default function FullViewportComponent() {
       } else {
         sorted.sort((a, b) => (b.marketCap || 0) - (a.marketCap || 0));
       }
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFilteredStockList(sorted);
       setDisplayedStockList(sorted.slice(0, stockDisplayCount));
       setStockHasMore(sorted.length > stockDisplayCount);
@@ -1280,7 +1286,7 @@ export default function FullViewportComponent() {
           (item.sector &&
             item.sector.toLowerCase().includes(stockSearchTerm.toLowerCase())),
       );
-      let sorted = filtered;
+      const sorted = filtered;
       if (stockSortBy === "volume") {
         sorted.sort((a, b) => b.volume - a.volume);
       } else if (stockSortBy === "change") {
@@ -1454,10 +1460,8 @@ export default function FullViewportComponent() {
 
   useEffect(() => {
     if (!containerRef.current || candleViewRef.current) return;
-
     const isDarkTheme = document.documentElement.classList.contains("dark");
     const currentTheme = isDarkTheme ? "dark" : "light";
-
     const candleView = new CandleView({
       parent: containerRef.current,
       title: "Market Data",
@@ -1466,11 +1470,10 @@ export default function FullViewportComponent() {
       locale: locale === "cn" ? "zh-cn" : "en",
       technologyPanel: true,
       drawingPanel: true,
+      timeframe:TimeframeEnum.ONE_SECOND
     });
-
     candleViewRef.current = candleView;
     setIsInitialized(true);
-
     return () => {
       if (candleViewRef.current) {
         candleViewRef.current.destroy();

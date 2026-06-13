@@ -19,7 +19,7 @@ const fetchNpmVersion = async (): Promise<VersionInfo> => {
         return JSON.parse(cached);
       }
     }
-    const response = await fetch('https://registry.npmjs.org/candleview', {
+    const response = await fetch('https://registry.npmjs.org/@candleview/core', {
       cache: 'no-store',
     });
     if (response.ok) {
@@ -38,7 +38,7 @@ const fetchNpmVersion = async (): Promise<VersionInfo> => {
   } catch (error) {
     console.error('Failed to fetch npm version:', error);
     return {
-      latest: 'v1.1.3',
+      latest: 'v3.0.6',
       loading: false,
       error: true,
     };
@@ -47,7 +47,7 @@ const fetchNpmVersion = async (): Promise<VersionInfo> => {
 
 export const useVersion = () => {
   const [versionInfo, setVersionInfo] = useState<VersionInfo>({
-    latest: 'v1.1.3',
+    latest: 'v3.0.6',
     loading: true,
     error: false,
   });

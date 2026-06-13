@@ -104,12 +104,11 @@ export default function FullViewportComponent() {
     locale: locale === "cn" ? "zh-cn" : "en",
     technologyPanel: true,
     drawingPanel: true,
-    timeframe: TimeframeEnum.FIFTEEN_MINUTES,
+    timeframe: TimeframeEnum.ONE_SECOND,
   });
   candleViewRef.current = candleView;
   setIsInitialized(true);
   
-  // 添加这行：初始化完成后重新设置数据
   setTimeout(() => {
     if (candleViewRef.current) {
       candleViewRef.current.setData(TEST_CANDLEVIEW_DATA8);
