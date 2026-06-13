@@ -5,7 +5,11 @@ import { TEST_CANDLEVIEW_DATA8 } from "../mock/mock_data_1";
 import { useI18n } from "../providers/I18nProvider";
 import Cryptos from "./Cryptos";
 import Stocks from "./Stocks";
-import { CandleView, ICandleViewDataPoint, TimeframeEnum } from "@candleview/core";
+import {
+  CandleView,
+  ICandleViewDataPoint,
+  TimeframeEnum,
+} from "@candleview/core";
 
 interface YahooFinanceChartResult {
   meta: {
@@ -1176,6 +1180,10 @@ export default function FullViewportComponent() {
         allData = allData.slice(-totalCandles);
       }
       setCandleData(allData);
+      if (candleViewRef.current && isInitialized) {
+        candleViewRef.current.setData(allData);
+        // candleViewRef.current.fitContent();
+      }
       setProgress(100);
     } catch (err) {
       setCandleDataError(
@@ -1238,7 +1246,12 @@ export default function FullViewportComponent() {
 
   const handleCryptoClick = async (pair: string) => {
     setCandleViewTimeframe("15m");
-    await fetchCandleDataByTimeframe(pair, "15m");
+    setIsLoadingCandleData(true);
+    try {
+      await fetchCandleDataByTimeframe(pair, "15m");
+    } finally {
+      setIsLoadingCandleData(false);
+    }
   };
 
   useEffect(() => {
@@ -1259,7 +1272,7 @@ export default function FullViewportComponent() {
       }
       clearInterval(stockInterval);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initializeWebSocket]);
 
   useEffect(() => {
@@ -1459,18 +1472,24 @@ export default function FullViewportComponent() {
   }, [locale, isInitialized]);
 
   useEffect(() => {
+    if (candleViewRef.current && isInitialized && selectedPair) {
+      candleViewRef.current.setTitle(selectedPair);
+    }
+  }, [selectedPair, isInitialized]);
+
+  useEffect(() => {
     if (!containerRef.current || candleViewRef.current) return;
     const isDarkTheme = document.documentElement.classList.contains("dark");
     const currentTheme = isDarkTheme ? "dark" : "light";
     const candleView = new CandleView({
       parent: containerRef.current,
-      title: "Market Data",
+      title: selectedPair || "Market Data",
       data: TEST_CANDLEVIEW_DATA8,
       theme: currentTheme,
       locale: locale === "cn" ? "zh-cn" : "en",
       technologyPanel: true,
       drawingPanel: true,
-      timeframe:TimeframeEnum.ONE_SECOND
+      timeframe: TimeframeEnum.ONE_SECOND,
     });
     candleViewRef.current = candleView;
     setIsInitialized(true);
@@ -1975,22 +1994,98 @@ export default function FullViewportComponent() {
   return (
     <div className="fixed inset-0 overflow-hidden">
       <div className="w-full h-full flex">
-        {/* 左侧图表区域 */}
         <div
-          className="h-full overflow-hidden"
+          className="h-full overflow-hidden relative"
           style={{
             width: `${leftPanelWidth}%`,
             minWidth: "50%",
             maxWidth: "90%",
-            position: "relative",
           }}
         >
           <div ref={containerRef} className="w-full h-full" />
+          {isLoadingCandleData && (
+            <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+              <div className="flex flex-col items-center space-y-4">
+                <div className="text-center">
+                  <p className="text-white font-medium text-lg">
+                    {locale === "cn"
+                      ? "加载K线数据中..."
+                      : "Loading chart data..."}
+                  </p>
+                  <p className="text-gray-300 text-sm mt-1">
+                    {selectedPair || "Loading"}
+                  </p>
+                  {progress > 0 && (
+                    <div className="mt-3 w-48">
+                      <div className="flex justify-between text-xs text-gray-300 mb-1">
+                        <span>{locale === "cn" ? "进度" : "Progress"}</span>
+                        <span>{progress}%</span>
+                      </div>
+                      <div className="w-full bg-gray-700 rounded-full h-1.5 overflow-hidden">
+                        <div
+                          className="bg-blue-500 h-1.5 rounded-full transition-all duration-300 ease-out"
+                          style={{ width: `${progress}%` }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+          {!isLoadingCandleData &&
+            candleDataError &&
+            candleDataError.includes("成功") && (
+              <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-20 animate-fadeOut">
+                <div className="bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg text-sm flex items-center space-x-2">
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                  <span>{candleDataError}</span>
+                </div>
+              </div>
+            )}
+
+          {!isLoadingCandleData &&
+            candleDataError &&
+            !candleDataError.includes("成功") && (
+              <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-20 animate-fadeOut">
+                <div className="bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg text-sm flex items-center space-x-2">
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                  <span>{candleDataError}</span>
+                </div>
+              </div>
+            )}
         </div>
 
-        {/* 分割线 */}
         <div
-          className={`w-2 h-full cursor-col-resize relative group transition-colors duration-200 ${isDark ? "bg-gray-700 hover:bg-gray-600" : "bg-gray-300 hover:bg-gray-400"}`}
+          className={`w-2 h-full cursor-col-resize relative group transition-colors duration-200 ${
+            isDark
+              ? "bg-gray-700 hover:bg-gray-600"
+              : "bg-gray-300 hover:bg-gray-400"
+          }`}
           onMouseDown={startResizing}
         >
           <div className="absolute inset-0 flex items-center justify-center">
@@ -2000,7 +2095,6 @@ export default function FullViewportComponent() {
           </div>
         </div>
 
-        {/* 右侧面板 */}
         <div
           className="h-full overflow-hidden flex flex-col"
           style={{
@@ -2010,14 +2104,18 @@ export default function FullViewportComponent() {
         >
           <div className="flex-1 overflow-hidden relative">
             <div
-              className={`absolute inset-0 overflow-y-auto ${isDark ? "scrollbar-dark" : "scrollbar-light"}`}
+              className={`absolute inset-0 overflow-y-auto ${
+                isDark ? "scrollbar-dark" : "scrollbar-light"
+              }`}
             >
               <div className="p-0">
                 <div className="space-y-0">
                   {menuItems.map((item) => (
                     <div
                       key={item.id}
-                      className={`overflow-hidden transition-all duration-300 ${isDark ? "bg-gray-800" : "bg-gray-50"}`}
+                      className={`overflow-hidden transition-all duration-300 ${
+                        isDark ? "bg-gray-800" : "bg-gray-50"
+                      }`}
                     >
                       <div
                         className={`px-3 py-2 flex justify-between items-center cursor-pointer transition-colors duration-200 ${
@@ -2028,7 +2126,9 @@ export default function FullViewportComponent() {
                         onClick={() => toggleMenu(item.id)}
                       >
                         <span
-                          className={`text-base font-medium ${isDark ? "text-gray-200" : "text-gray-800"}`}
+                          className={`text-base font-medium ${
+                            isDark ? "text-gray-200" : "text-gray-800"
+                          }`}
                         >
                           {item.title}
                         </span>
@@ -2064,6 +2164,7 @@ export default function FullViewportComponent() {
       {isResizing && (
         <div className="fixed inset-0 z-50 cursor-col-resize"></div>
       )}
+
       <style jsx global>{`
         .scrollbar-light {
           scrollbar-width: thin;
@@ -2151,6 +2252,34 @@ export default function FullViewportComponent() {
         .scrollbar-light::-webkit-scrollbar-track-piece:end,
         .scrollbar-dark::-webkit-scrollbar-track-piece:end {
           background: transparent;
+        }
+
+        @keyframes fadeOut {
+          0% {
+            opacity: 1;
+          }
+          70% {
+            opacity: 1;
+          }
+          100% {
+            opacity: 0;
+            visibility: hidden;
+          }
+        }
+        .animate-fadeOut {
+          animation: fadeOut 2s ease forwards;
+        }
+
+        @keyframes spin {
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
+          }
+        }
+        .animate-spin {
+          animation: spin 1s linear infinite;
         }
       `}</style>
     </div>
